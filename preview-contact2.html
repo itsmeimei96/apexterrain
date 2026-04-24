@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  .font-heading { font-family: 'Barlow Condensed', sans-serif; }
+  .section-label { font-family: 'Roboto', sans-serif; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #f28c28; font-weight: 500; }
+  .topo-lines { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cpath d='M0,300 Q150,200 300,300 T600,300' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.15'/%3E%3Cpath d='M0,250 Q150,150 300,250 T600,250' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.15'/%3E%3Cpath d='M0,350 Q150,250 300,350 T600,350' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.15'/%3E%3Cpath d='M0,200 Q150,100 300,200 T600,200' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.12'/%3E%3Cpath d='M0,400 Q150,300 300,400 T600,400' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.12'/%3E%3Cpath d='M0,150 Q150,50 300,150 T600,150' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.1'/%3E%3Cpath d='M0,450 Q150,350 300,450 T600,450' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.1'/%3E%3C/svg%3E"); }
+  .quote-label { font-family: 'Roboto', sans-serif; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #555; margin-bottom: 6px; display: block; }
+  .quote-input { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; font-family: 'Roboto', sans-serif; font-size: 0.9rem; color: #1a1a1a; background: #fff; outline: none; transition: border-color 0.2s ease; box-sizing: border-box; }
+  .quote-input::placeholder { color: #aaa; }
+  .quote-input:focus { border-color: #f28c28; }
+  .service-checkbox { display: none; }
+  .service-label { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid #d1d5db; cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #1a1a1a; transition: border-color 0.2s ease, background 0.2s ease; user-select: none; }
+  .service-label:hover { border-color: #f28c28; background: #fff8f2; }
+  .service-checkbox:checked + .service-label { border-color: #f28c28; background: #fff4e6; color: #c96f0a; }
+  .service-box { display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; border: 1.5px solid #d1d5db; flex-shrink: 0; transition: border-color 0.2s ease, background 0.2s ease; }
+  .service-checkbox:checked + .service-label .service-box { border-color: #f28c28; background: #f28c28; }
+  .service-checkbox:checked + .service-label .service-checkmark { display: block; }
+  .service-checkmark { display: none; width: 10px; height: 10px; }
+</style>
+</head>
+<body style="margin:0; background:#141414;">
+
+<section class="relative overflow-hidden" style="background: #141414;">
+  <div class="absolute inset-0 topo-lines opacity-30 pointer-events-none"></div>
+  <div class="absolute inset-0" style="background: radial-gradient(ellipse 70% 90% at 20% 60%, rgba(242,140,40,0.06) 0%, transparent 65%);"></div>
+
+  <div class="relative max-w-7xl mx-auto px-6 lg:px-12 py-24 grid lg:grid-cols-2 gap-16 items-start" style="max-width:1280px; margin:0 auto; padding:96px 48px; display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:start;">
+
+    <!-- Left -->
+    <div style="padding-top:16px;">
+      <p class="section-label" style="margin-bottom:20px;">Get Started</p>
+      <h2 class="font-heading text-white" style="font-size:5.5rem; letter-spacing:-0.02em; line-height:0.95; margin-bottom:24px;">FREE <span style="color:#f28c28;">QUOTE</span></h2>
+      <p style="color:rgba(255,255,255,0.5); line-height:1.75; font-weight:300; font-size:1rem; max-width:420px; margin-bottom:32px; font-family:'Roboto',sans-serif;">Submit your project details for a professional consultation. We provide straightforward solutions for the most challenging terrain.</p>
+
+      <ul style="display:flex;flex-direction:column;gap:13px;margin-bottom:32px;padding:0;list-style:none;">
+        <li style="display:flex;align-items:flex-start;gap:12px;font-family:'Roboto',sans-serif;font-size:0.9rem;">
+          <span style="color:#f28c28;font-size:0.55rem;flex-shrink:0;margin-top:5px;">▲</span>
+          <span><strong style="color:#fff;font-weight:600;">Free Estimates</strong> <span style="color:rgba(255,255,255,0.4);">—</span> <span style="color:rgba(255,255,255,0.55);font-weight:300;">Complimentary for the Lower Mainland (North Van to Hope).</span></span>
+        </li>
+        <li style="display:flex;align-items:flex-start;gap:12px;font-family:'Roboto',sans-serif;font-size:0.9rem;">
+          <span style="color:#f28c28;font-size:0.55rem;flex-shrink:0;margin-top:5px;">▲</span>
+          <span><strong style="color:#fff;font-weight:600;">Priority Response</strong> <span style="color:rgba(255,255,255,0.4);">—</span> <span style="color:rgba(255,255,255,0.55);font-weight:300;">Feedback within two business days.</span></span>
+        </li>
+        <li style="display:flex;align-items:flex-start;gap:12px;font-family:'Roboto',sans-serif;font-size:0.9rem;">
+          <span style="color:#f28c28;font-size:0.55rem;flex-shrink:0;margin-top:5px;">▲</span>
+          <span><strong style="color:#fff;font-weight:600;">Project Integrity</strong> <span style="color:rgba(255,255,255,0.4);">—</span> <span style="color:rgba(255,255,255,0.55);font-weight:300;">No hidden costs; honest, fixed-rate pricing.</span></span>
+        </li>
+        <li style="display:flex;align-items:flex-start;gap:12px;font-family:'Roboto',sans-serif;font-size:0.9rem;">
+          <span style="color:#f28c28;font-size:0.55rem;flex-shrink:0;margin-top:5px;">▲</span>
+          <span><strong style="color:#fff;font-weight:600;">Technical Precision</strong> <span style="color:rgba(255,255,255,0.4);">—</span> <span style="color:rgba(255,255,255,0.55);font-weight:300;">Specialized equipment operated by local experts.</span></span>
+        </li>
+        <li style="display:flex;align-items:flex-start;gap:12px;font-family:'Roboto',sans-serif;font-size:0.9rem;">
+          <span style="color:#f28c28;font-size:0.55rem;flex-shrink:0;margin-top:5px;">▲</span>
+          <span><strong style="color:#fff;font-weight:600;">Professional Standards</strong> <span style="color:rgba(255,255,255,0.4);">—</span> <span style="color:rgba(255,255,255,0.55);font-weight:300;">Dependable service with an elevated client experience.</span></span>
+        </li>
+        <li style="display:flex;align-items:flex-start;gap:12px;font-family:'Roboto',sans-serif;font-size:0.9rem;">
+          <span style="color:#f28c28;font-size:0.55rem;flex-shrink:0;margin-top:5px;">▲</span>
+          <span><strong style="color:#fff;font-weight:600;">Expansive Coverage</strong> <span style="color:rgba(255,255,255,0.4);">—</span> <span style="color:rgba(255,255,255,0.55);font-weight:300;">Strategic operations from Vancouver to Merritt.</span></span>
+        </li>
+      </ul>
+
+      <!-- Home base -->
+      <p style="font-family:'Roboto',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.6);font-weight:400;line-height:1.6;padding:14px 16px;border-left:2px solid #f28c28;background:rgba(242,140,40,0.05);margin-bottom:32px;">
+        <strong style="color:#fff;font-weight:500;">Proudly serving British Columbia, Canada.</strong> Our home base is located in Mission, BC.
+      </p>
+
+      <!-- Contact details -->
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <a href="tel:+16040001234" style="display:flex;align-items:center;gap:16px;text-decoration:none;">
+          <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(242,140,40,0.12);border:1px solid rgba(242,140,40,0.25);flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 13.5 19.79 19.79 0 01.1 4.9 2 2 0 012.07 2.72h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div>
+            <p style="font-family:'Roboto',sans-serif;font-size:0.7rem;letter-spacing:0.12em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:2px;">Call Us</p>
+            <p style="font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:600;color:#fff;letter-spacing:0.02em;">604-000-1234</p>
+          </div>
+        </a>
+
+        <a href="mailto:info@apexterrainltd.com" style="display:flex;align-items:center;gap:16px;text-decoration:none;">
+          <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(242,140,40,0.12);border:1px solid rgba(242,140,40,0.25);flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <p style="font-family:'Roboto',sans-serif;font-size:0.7rem;letter-spacing:0.12em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:2px;">Email Us</p>
+            <p style="font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:600;color:#fff;letter-spacing:0.02em;">info@apexterrainltd.com</p>
+          </div>
+        </a>
+
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(242,140,40,0.12);border:1px solid rgba(242,140,40,0.25);flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <p style="font-family:'Roboto',sans-serif;font-size:0.7rem;letter-spacing:0.12em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:2px;">Service Area</p>
+            <p style="font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:600;color:#fff;letter-spacing:0.02em;">British Columbia, Canada</p>
+            <p style="font-family:'Roboto',sans-serif;font-size:0.78rem;color:rgba(255,255,255,0.4);font-weight:300;margin-top:1px;">Home base: Mission, BC</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: White form card -->
+    <div style="background:#ffffff;border-top:4px solid #f28c28;box-shadow:0 32px 80px rgba(0,0,0,0.5);">
+      <div style="padding:40px;">
+        <h3 class="font-heading" style="font-size:1.5rem;font-weight:800;letter-spacing:0.06em;color:#1a1a1a;text-transform:uppercase;margin-bottom:28px;">Request a Free Quote</h3>
+
+        <form style="display:flex;flex-direction:column;gap:18px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div><label class="quote-label">First Name *</label><input type="text" placeholder="Jane" class="quote-input" /></div>
+            <div><label class="quote-label">Last Name *</label><input type="text" placeholder="Smith" class="quote-input" /></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div><label class="quote-label">Email Address *</label><input type="email" placeholder="jane@email.com" class="quote-input" /></div>
+            <div><label class="quote-label">Phone Number *</label><input type="tel" placeholder="(604) 000-0000" class="quote-input" /></div>
+          </div>
+          <div><label class="quote-label">Property Address *</label><input type="text" placeholder="Start typing your address..." class="quote-input" /></div>
+
+          <div>
+            <label class="quote-label" style="margin-bottom:10px;">Services Required * <span style="font-size:0.65rem;color:#999;letter-spacing:0.05em;text-transform:none;font-weight:400;">(select all that apply)</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div><input type="checkbox" id="s1" class="service-checkbox"><label for="s1" class="service-label"><span class="service-box"><svg class="service-checkmark" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Tight Access Steep Terrain</label></div>
+              <div><input type="checkbox" id="s2" class="service-checkbox"><label for="s2" class="service-label"><span class="service-box"><svg class="service-checkmark" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Fire Protection</label></div>
+              <div><input type="checkbox" id="s3" class="service-checkbox"><label for="s3" class="service-label"><span class="service-box"><svg class="service-checkmark" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Land Clearing</label></div>
+              <div><input type="checkbox" id="s4" class="service-checkbox"><label for="s4" class="service-label"><span class="service-box"><svg class="service-checkmark" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Storm Clean-Up</label></div>
+              <div style="grid-column:1/-1;"><input type="checkbox" id="s5" class="service-checkbox"><label for="s5" class="service-label"><span class="service-box"><svg class="service-checkmark" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Other – Please describe in details below or we can discuss on-site</label></div>
+            </div>
+          </div>
+
+          <div><label class="quote-label">Additional Details <span style="font-weight:300;text-transform:none;letter-spacing:0;">(Optional)</span></label><textarea rows="4" placeholder="Tell us more about your project — property size, access constraints, timeline, etc." class="quote-input" style="resize:none;"></textarea></div>
+
+          <button type="submit" style="width:100%;background:#f28c28;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:0.1em;text-transform:uppercase;padding:16px 24px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;">
+            Submit Quote Request <span style="font-size:0.7rem;">▲</span>
+          </button>
+          <p style="text-align:center;font-family:'Roboto',sans-serif;font-size:0.78rem;color:#999;margin-top:-4px;">By submitting, you agree to be contacted by Apex Terrain Management LTD.</p>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</body>
+</html>

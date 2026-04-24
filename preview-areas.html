@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Areas Preview</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto:wght@300;400;500&display=swap');
+  .font-heading { font-family: 'Barlow Condensed', sans-serif; }
+  .section-label { font-family: 'Roboto', sans-serif; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #f28c28; font-weight: 500; }
+  .area-card:hover .area-img { transform: scale(1.05); }
+</style>
+</head>
+<body style="background:#161616; margin:0; padding:0;">
+<section class="py-28 px-6 lg:px-12 relative overflow-hidden" style="background: #161616;">
+  <div class="max-w-7xl mx-auto relative">
+    <div class="text-center mb-16">
+      <p class="section-label mb-4">Where We Work</p>
+      <h2 class="font-heading text-white" style="font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.02em;">SERVICE <span style="color: #f28c28;">AREA</span></h2>
+      <div class="mt-4 mx-auto" style="width: 60px; height: 3px; background: #f28c28;"></div>
+      <p class="mt-6 mx-auto text-white/50 max-w-xl" style="line-height: 1.75; font-weight: 300; font-size: 1rem;">
+        Proudly serving the Lower Mainland and the Interior. We travel across BC for the right project&mdash;just ask!
+      </p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent;">
+        <img src="brand_assets/Vancouver.avif" alt="Vancouver mountains" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+        <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-5">
+          <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em; line-height: 1.1;">Vancouver &amp;<br/>Lower Mainland</h3>
+        </div>
+      </div>
+
+      <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent;">
+        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80" alt="North Vancouver forest" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+        <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-5">
+          <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">North Vancouver</h3>
+        </div>
+      </div>
+
+      <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent;">
+        <img src="brand_assets/Whistler.jpg" alt="Whistler alpine landscape" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+        <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-5">
+          <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Whistler</h3>
+        </div>
+      </div>
+
+      <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent;">
+        <img src="brand_assets/Mission.jpg" alt="Mission forest" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+        <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-5">
+          <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Mission</h3>
+        </div>
+      </div>
+
+      <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent;">
+        <img src="brand_assets/Abbotsford.jpg" alt="Abbotsford valley" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+        <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-5">
+          <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Abbotsford</h3>
+        </div>
+      </div>
+
+      <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent;">
+        <img src="brand_assets/PortCoquitlam.jpg" alt="Chilliwack landscape" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+        <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-5">
+          <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Chilliwack</h3>
+        </div>
+      </div>
+
+      <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent;">
+        <img src="brand_assets/Hope.jpg" alt="Hope mountain landscape" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+        <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-5">
+          <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Hope</h3>
+        </div>
+      </div>
+
+      <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent;">
+        <img src="brand_assets/Merritt.jpg" alt="Merritt grasslands" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+        <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-5">
+          <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Merritt</h3>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom contact bar -->
+    <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 py-5 px-8" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
+      <span style="font-size: 1.1rem;">📍</span>
+      <p class="text-white/60 text-center sm:text-left" style="font-size: 0.95rem; font-weight: 300; line-height: 1.5;">
+        Don't see your area?
+        <a href="#contact" style="color: #f28c28; font-weight: 500; text-decoration: none;">Contact us</a>
+        &mdash; we travel anywhere in BC for the right project.
+      </p>
+    </div>
+  </div>
+</section>
+</body>
+</html>

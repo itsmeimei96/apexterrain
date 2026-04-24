@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  .font-heading { font-family: 'Barlow Condensed', sans-serif; }
+  .section-label { font-family: 'Roboto', sans-serif; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #f28c28; font-weight: 500; }
+  .topo-lines { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cpath d='M0,300 Q150,200 300,300 T600,300' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.15'/%3E%3Cpath d='M0,250 Q150,150 300,250 T600,250' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.15'/%3E%3Cpath d='M0,350 Q150,250 300,350 T600,350' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.15'/%3E%3Cpath d='M0,200 Q150,100 300,200 T600,200' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.12'/%3E%3Cpath d='M0,400 Q150,300 300,400 T600,400' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.12'/%3E%3Cpath d='M0,150 Q150,50 300,150 T600,150' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.1'/%3E%3Cpath d='M0,450 Q150,350 300,450 T600,450' fill='none' stroke='%23ffffff' stroke-width='0.8' opacity='0.1'/%3E%3C/svg%3E"); }
+  .faq-icon { transition: transform 0.3s ease; }
+</style>
+</head>
+<body style="margin:0;background:#0f0f0f;">
+
+<section style="padding:96px 48px;background:#0f0f0f;position:relative;overflow:hidden;">
+  <div class="absolute inset-0 topo-lines opacity-25 pointer-events-none"></div>
+  <div style="position:relative;z-index:10;max-width:1000px;margin:0 auto;">
+
+    <div style="text-align:center;margin-bottom:56px;">
+      <p class="section-label" style="margin-bottom:16px;">Got Questions?</p>
+      <h2 class="font-heading" style="font-size:4.4rem;letter-spacing:-0.01em;line-height:1;color:#fff;margin-bottom:0;white-space:nowrap;">FREQUENTLY ASKED <span style="color:#f28c28;">QUESTIONS</span></h2>
+      <p style="margin-top:20px;color:rgba(255,255,255,0.45);font-family:'Roboto',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;max-width:520px;margin-left:auto;margin-right:auto;">Everything you need to know before getting started with Apex Terrain Management.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+
+      <!-- Q1 open for preview -->
+      <div style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.35);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 28px;cursor:pointer;">
+          <span style="font-family:'Roboto',sans-serif;font-size:1rem;font-weight:700;color:#1a1a1a;">Do you offer free estimates?</span>
+          <span style="width:34px;height:34px;border-radius:50%;background:#f28c28;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:20px;transform:rotate(45deg);">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+        </div>
+        <div style="padding:0 28px 24px;">
+          <p style="font-family:'Roboto',sans-serif;font-size:0.93rem;color:#444;line-height:1.75;font-weight:300;">Yes, absolutely. We'll visit your property in person, assess the area, and provide a clear estimate at no cost. During the visit, we'll also walk you through what work is essential and what's optional — so you can make informed decisions with confidence.</p>
+          <a href="#contact" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;color:#f28c28;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">
+            Request your free estimate
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Q2-7 closed -->
+      <div style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:space-between;padding:20px 28px;">
+        <span style="font-family:'Roboto',sans-serif;font-size:1rem;font-weight:700;color:#1a1a1a;">Can your machines handle extremely steep or narrow access terrain?</span>
+        <span style="width:34px;height:34px;border-radius:50%;background:#f28c28;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:20px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+      </div>
+
+      <div style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:space-between;padding:20px 28px;">
+        <span style="font-family:'Roboto',sans-serif;font-size:1rem;font-weight:700;color:#1a1a1a;">Is mulching environmentally friendly?</span>
+        <span style="width:34px;height:34px;border-radius:50%;background:#f28c28;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:20px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+      </div>
+
+      <div style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:space-between;padding:20px 28px;">
+        <span style="font-family:'Roboto',sans-serif;font-size:1rem;font-weight:700;color:#1a1a1a;">How soon can you start my project?</span>
+        <span style="width:34px;height:34px;border-radius:50%;background:#f28c28;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:20px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+      </div>
+
+      <div style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:space-between;padding:20px 28px;">
+        <span style="font-family:'Roboto',sans-serif;font-size:1rem;font-weight:700;color:#1a1a1a;">Are you fully insured and WorkSafe BC compliant?</span>
+        <span style="width:34px;height:34px;border-radius:50%;background:#f28c28;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:20px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+      </div>
+
+      <div style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:space-between;padding:20px 28px;">
+        <span style="font-family:'Roboto',sans-serif;font-size:1rem;font-weight:700;color:#1a1a1a;">What types of properties do you work on?</span>
+        <span style="width:34px;height:34px;border-radius:50%;background:#f28c28;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:20px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+      </div>
+
+      <div style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:space-between;padding:20px 28px;">
+        <span style="font-family:'Roboto',sans-serif;font-size:1rem;font-weight:700;color:#1a1a1a;">How far in advance should I schedule?</span>
+        <span style="width:34px;height:34px;border-radius:50%;background:#f28c28;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:20px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

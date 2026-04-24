@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apex Terrain Management — Mulching & Land Clearing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiQHMuQAv_DXH5U27PKSOyqTxCuxMLySI&libraries=places&callback=initAutocomplete" async defer></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            orange: '#f28c28',
+            'orange-dark': '#d97518',
+            'orange-light': '#f5a352',
+            anthracite: '#1a1a1a',
+            'anthracite-2': '#222222',
+            'anthracite-3': '#2a2a2a',
+            'geo-grey': '#555555',
+            'geo-grey-2': '#3a3a3a',
+          },
+          fontFamily: {
+            heading: ['Barlow Condensed', 'sans-serif'],
+            body: ['Roboto', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #1a1a1a; color: #fff; font-family: 'Roboto', sans-serif; overflow-x: hidden; }
+
+    /* Topographic SVG noise texture */
+    .topo-bg {
+      background-color: #1a1a1a;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='6' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    }
+
+    /* Topo contour lines overlay */
+    .topo-lines {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='600' viewBox='0 0 1200 600'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='0.5' opacity='0.06'%3E%3Cellipse cx='600' cy='700' rx='650' ry='300'/%3E%3Cellipse cx='600' cy='700' rx='550' ry='240'/%3E%3Cellipse cx='600' cy='700' rx='450' ry='180'/%3E%3Cellipse cx='600' cy='700' rx='350' ry='120'/%3E%3Cellipse cx='600' cy='700' rx='250' ry='70'/%3E%3Cellipse cx='600' cy='700' rx='150' ry='30'/%3E%3Cellipse cx='200' cy='500' rx='280' ry='150'/%3E%3Cellipse cx='200' cy='500' rx='200' ry='100'/%3E%3Cellipse cx='200' cy='500' rx='120' ry='60'/%3E%3Cellipse cx='1000' cy='400' rx='320' ry='160'/%3E%3Cellipse cx='1000' cy='400' rx='220' ry='100'/%3E%3Cellipse cx='1000' cy='400' rx='120' ry='50'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: cover;
+    }
+
+    /* Bank Gothic approximation with Barlow Condensed */
+    .font-heading { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; letter-spacing: -0.01em; text-transform: uppercase; }
+    .font-heading-md { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+
+    /* Orange accent line */
+    .accent-line { display: inline-flex; align-items: center; gap: 8px; }
+    .accent-line::before, .accent-line::after { content: ''; display: block; height: 2px; width: 32px; background: #f28c28; }
+
+    /* Buttons */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #f28c28; color: #1a1a1a;
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+      font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 14px 32px; border: 2px solid #f28c28;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease;
+      box-shadow: 0 4px 20px rgba(242,140,40,0.3), 0 1px 4px rgba(0,0,0,0.4);
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+    .btn-primary:hover { background: #fff; color: #1a1a1a; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(242,140,40,0.45), 0 2px 8px rgba(0,0,0,0.5); }
+    .btn-primary:active { transform: translateY(0px); }
+    .btn-primary:focus-visible { outline: 2px solid #f28c28; outline-offset: 3px; }
+
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: #fff;
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+      font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 14px 32px; border: 2px solid rgba(255,255,255,0.4);
+      cursor: pointer; text-decoration: none;
+      transition: border-color 0.2s ease, color 0.2s ease, transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .btn-outline:hover { border-color: #f28c28; color: #f28c28; transform: translateY(-2px); }
+    .btn-outline:active { transform: translateY(0); }
+    .btn-outline:focus-visible { outline: 2px solid #f28c28; outline-offset: 3px; }
+
+    /* Nav link hover */
+    .nav-link {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
+      font-size: 0.95rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(255,255,255,0.75); text-decoration: none;
+      position: relative; padding-bottom: 2px;
+      transition: color 0.2s ease;
+    }
+    .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: #f28c28; transition: width 0.25s ease; }
+    .nav-link:hover { color: #fff; }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link:focus-visible { outline: 2px solid #f28c28; outline-offset: 3px; }
+
+    /* Service cards */
+    .service-card {
+      background: #222222; border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s ease, box-shadow 0.25s ease;
+      position: relative; overflow: hidden;
+    }
+    .service-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(242,140,40,0.04) 0%, transparent 60%); opacity: 0; transition: opacity 0.25s ease; }
+    .service-card:hover { transform: translateY(-6px); border-color: rgba(242,140,40,0.4); box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(242,140,40,0.15); }
+    .service-card:hover::before { opacity: 1; }
+
+    /* Stat items */
+    .stat-num {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+      font-size: clamp(3rem, 6vw, 5rem); line-height: 1;
+      color: #f28c28; letter-spacing: -0.02em;
+    }
+
+    /* Process step connector */
+    .step-connector { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(242,140,40,0.6) 0%, rgba(242,140,40,0.1) 100%); margin: 0 16px; margin-top: -24px; }
+
+    /* Section label */
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+      letter-spacing: 0.18em; font-size: 0.8rem; text-transform: uppercase;
+      color: #f28c28;
+    }
+
+    /* Scrolled nav */
+    #main-nav { transition: background 0.3s ease, box-shadow 0.3s ease; }
+    #main-nav.scrolled { background: rgba(26,26,26,0.97); box-shadow: 0 2px 32px rgba(0,0,0,0.5); }
+
+    /* Hero diagonal cut */
+    .hero-clip { clip-path: polygon(0 0, 100% 0, 100% 92%, 0 100%); }
+
+    /* Orange gradient glow */
+    .orange-glow { box-shadow: 0 0 80px rgba(242,140,40,0.15), 0 0 160px rgba(242,140,40,0.06); }
+
+    /* Testimonial card */
+    .testimonial-card {
+      background: #222222; border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .testimonial-card:hover { transform: translateY(-4px); border-color: rgba(242,140,40,0.25); }
+
+    /* Mobile menu */
+    #mobile-menu { transition: opacity 0.2s ease, transform 0.2s ease; }
+    #mobile-menu.hidden { opacity: 0; pointer-events: none; transform: translateY(-8px); }
+  </style>
+</head>
+<body class="topo-bg">
+
+  <!-- ═══════════════ NAV ═══════════════ -->
+  <nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 px-6 lg:px-12 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="#" class="flex-shrink-0" aria-label="Apex Terrain Management">
+        <img src="brand_assets/logo.png" alt="Apex Terrain Management" class="h-12 w-auto" />
+      </a>
+
+      <!-- Desktop nav -->
+      <div class="hidden lg:flex items-center gap-8">
+        <a href="#services" class="nav-link">Services</a>
+        <a href="#service-areas" class="nav-link">Areas</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#process" class="nav-link">Our Process</a>
+        <a href="#testimonials" class="nav-link">Reviews</a>
+        <a href="#contact" class="btn-primary text-sm" style="padding: 10px 24px;">Free Quote</a>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button id="menu-btn" class="lg:hidden p-2 text-white" aria-label="Open menu" style="transition: color 0.2s ease;"
+        onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='#fff'">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden lg:hidden mt-4 pb-4 border-t border-white/10">
+      <div class="flex flex-col gap-4 pt-4 px-2">
+        <a href="#services" class="nav-link" onclick="closeMobileMenu()">Services</a>
+        <a href="#about" class="nav-link" onclick="closeMobileMenu()">About</a>
+        <a href="#process" class="nav-link" onclick="closeMobileMenu()">Our Process</a>
+        <a href="#testimonials" class="nav-link" onclick="closeMobileMenu()">Reviews</a>
+        <a href="#contact" class="btn-primary self-start mt-2" onclick="closeMobileMenu()">Free Quote</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════ HERO ═══════════════ -->
+  <section class="hero-clip relative min-h-screen flex items-center topo-lines" style="padding-top: 80px; background-color: #161616;">
+
+    <!-- Radial gradient overlays for depth -->
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse 70% 60% at 60% 50%, rgba(242,140,40,0.07) 0%, transparent 70%), radial-gradient(ellipse 50% 80% at 10% 80%, rgba(242,140,40,0.04) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 90% 10%, rgba(255,255,255,0.02) 0%, transparent 70%);"></div>
+
+    <!-- Subtle grain texture -->
+    <div class="absolute inset-0 opacity-30" style="background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.08'/%3E%3C/svg%3E\"); pointer-events: none;"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-24 grid lg:grid-cols-2 gap-12 items-center">
+      <!-- Left: copy -->
+      <div>
+        <p class="section-label mb-6">British Columbia's Land Clearing Specialists</p>
+        <h1 class="font-heading text-white mb-6" style="font-size: clamp(3.2rem, 7vw, 6rem); line-height: 0.95;">
+          Where Tough<br /><span style="color: #f28c28;">Terrain</span><br />Meets Expert<br />Hands
+        </h1>
+        <p class="text-white/60 mb-10 max-w-lg" style="font-size: 1.05rem; line-height: 1.75; font-weight: 300;">
+          Apex Terrain Management LTD. delivers precision mulching, fire protection, land clearing, and storm clean-up — tackling the sites other contractors won't touch.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#contact" class="btn-primary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Get a Free Quote
+          </a>
+          <a href="#services" class="btn-outline">View Services</a>
+        </div>
+
+        <!-- Trust badges -->
+        <div class="mt-12 flex flex-wrap gap-6 items-center">
+          <div class="flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#f28c28"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span style="font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-family: 'Barlow Condensed', sans-serif; font-weight: 600;">Fully Insured</span>
+          </div>
+          <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1);"></div>
+          <div class="flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#f28c28"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span style="font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-family: 'Barlow Condensed', sans-serif; font-weight: 600;">Licensed & Certified</span>
+          </div>
+          <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1);"></div>
+          <div class="flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#f28c28"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span style="font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-family: 'Barlow Condensed', sans-serif; font-weight: 600;">Free Estimates</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: hero image card -->
+      <div class="relative hidden lg:block">
+        <div class="relative rounded-sm overflow-hidden orange-glow" style="aspect-ratio: 4/3; border: 1px solid rgba(242,140,40,0.2);">
+          <img src="https://placehold.co/800x600/1a1a1a/333333?text=Project+Gallery+Coming+Soon" alt="Apex Terrain project gallery coming soon" class="w-full h-full object-cover" style="mix-blend-mode: normal;" />
+          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(26,26,26,0.8) 0%, rgba(26,26,26,0.1) 60%, transparent 100%);"></div>
+          <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(242,140,40,0.15) 0%, transparent 50%); mix-blend-mode: multiply;"></div>
+          <!-- Bottom label -->
+          <div class="absolute bottom-0 left-0 right-0 p-6">
+            <p class="font-heading-md text-white" style="font-size: 1.4rem;">Tight Access Specialists</p>
+            <p class="text-white/50 text-sm mt-1" style="font-weight: 300;">Where others can't go — we deliver</p>
+          </div>
+          <!-- Corner accent -->
+          <div class="absolute top-0 left-0 w-12 h-12" style="background: linear-gradient(135deg, rgba(242,140,40,0.6) 0%, transparent 60%);"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.6);">Scroll</span>
+      <div style="width: 1px; height: 40px; background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ SERVICES ═══════════════ -->
+  <section id="services" class="py-28 px-6 lg:px-12">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <p class="section-label mb-4">What We Do</p>
+        <h2 class="font-heading text-white" style="font-size: clamp(2.5rem, 5vw, 4rem);">Our Core Services</h2>
+        <div class="mt-4 mx-auto" style="width: 60px; height: 3px; background: #f28c28;"></div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <!-- Tight Access Mulching -->
+        <div class="service-card p-8 flex flex-col gap-6">
+          <div class="w-14 h-14 flex items-center justify-center rounded-sm" style="background: rgba(242,140,40,0.1); border: 1px solid rgba(242,140,40,0.25);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8">
+              <path d="M12 22v-7"/>
+              <path d="M9 15h6"/>
+              <path d="M7 11l5-7 5 7H7z"/>
+              <path d="M5 15l7-10 7 10H5z"/>
+              <path d="M3 19h18"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading text-white mb-3" style="font-size: 1.5rem;">Tight Access<br />Steep Terrain</h3>
+            <p class="text-white/50" style="line-height: 1.7; font-size: 0.9rem; font-weight: 300;">Specialized equipment and technique to access and mulch terrain where standard machines simply cannot operate.</p>
+          </div>
+          <a href="#contact" class="mt-auto text-orange font-heading-md text-sm flex items-center gap-2" style="color: #f28c28; transition: gap 0.2s ease;" onmouseover="this.style.gap='10px'" onmouseout="this.style.gap='8px'">
+            Learn More
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Fire Protection -->
+        <div class="service-card p-8 flex flex-col gap-6">
+          <div class="w-14 h-14 flex items-center justify-center rounded-sm" style="background: rgba(242,140,40,0.1); border: 1px solid rgba(242,140,40,0.25);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8">
+              <path d="M8.5 14.5A2.5 2.5 0 0011 17c0 1.38-1.12 2.5-2.5 2.5S6 18.38 6 17c0-1 .5-2 1.5-2.5"/>
+              <path d="M12 2c0 0-6 4.5-6 10a6 6 0 0012 0c0-2.5-1-4.5-2-6 0 0-.5 2-2 3C13 7 12 4 12 2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading text-white mb-3" style="font-size: 1.5rem;">Fire<br />Protection</h3>
+            <p class="text-white/50" style="line-height: 1.7; font-size: 0.9rem; font-weight: 300;">Strategic fuel reduction and defensible space creation to protect your property from wildfire risk across BC's interface zones.</p>
+          </div>
+          <a href="#contact" class="mt-auto text-orange font-heading-md text-sm flex items-center gap-2" style="color: #f28c28; transition: gap 0.2s ease;" onmouseover="this.style.gap='10px'" onmouseout="this.style.gap='8px'">
+            Learn More
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Clearing -->
+        <div class="service-card p-8 flex flex-col gap-6">
+          <div class="w-14 h-14 flex items-center justify-center rounded-sm" style="background: rgba(242,140,40,0.1); border: 1px solid rgba(242,140,40,0.25);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8">
+              <path d="M17 8C8 10 5.9 16.17 3.82 19.82M11 7c0 0-1-4 3-6 0 3 2.5 4 2.5 6.5C16.5 9 17 6.5 17 6.5c2 2 2 5.5 0 7.5-1 1-2.5 1.5-4 1.5-3 0-5-2-5-5"/>
+              <line x1="3" y1="22" x2="5" y2="22"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading text-white mb-3" style="font-size: 1.5rem;">Land<br />Clearing</h3>
+            <p class="text-white/50" style="line-height: 1.7; font-size: 0.9rem; font-weight: 300;">Full-site vegetation removal for development, agriculture, or restoration. We leave your land ready for whatever comes next.</p>
+          </div>
+          <a href="#contact" class="mt-auto text-orange font-heading-md text-sm flex items-center gap-2" style="color: #f28c28; transition: gap 0.2s ease;" onmouseover="this.style.gap='10px'" onmouseout="this.style.gap='8px'">
+            Learn More
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Storm Clean-Up -->
+        <div class="service-card p-8 flex flex-col gap-6">
+          <div class="w-14 h-14 flex items-center justify-center rounded-sm" style="background: rgba(242,140,40,0.1); border: 1px solid rgba(242,140,40,0.25);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8">
+              <path d="M19 16.9A5 5 0 0018 7h-1.26A8 8 0 104 15.25"/>
+              <polyline points="13 11 9 17 15 17 11 23"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading text-white mb-3" style="font-size: 1.5rem;">Storm<br />Clean-Up</h3>
+            <p class="text-white/50" style="line-height: 1.7; font-size: 0.9rem; font-weight: 300;">Rapid response to storm damage — fallen trees, debris clearance, and site restoration to get you back to normal fast.</p>
+          </div>
+          <a href="#contact" class="mt-auto text-orange font-heading-md text-sm flex items-center gap-2" style="color: #f28c28; transition: gap 0.2s ease;" onmouseover="this.style.gap='10px'" onmouseout="this.style.gap='8px'">
+            Learn More
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ SERVICE AREAS ═══════════════ -->
+  <section id="service-areas" class="py-28 px-6 lg:px-12 relative overflow-hidden" style="background: #161616;">
+    <div class="absolute inset-0 topo-lines opacity-20 pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto relative z-10">
+
+      <div class="text-center mb-16">
+        <p class="section-label mb-4">Where We Work</p>
+        <h2 class="font-heading text-white" style="font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.02em;">SERVICE <span style="color: #f28c28;">AREA</span></h2>
+        <div class="mt-4 mx-auto" style="width: 60px; height: 3px; background: #f28c28;"></div>
+        <p class="mt-6 mx-auto text-white/50 max-w-xl" style="line-height: 1.75; font-weight: 300; font-size: 1rem;">
+          Proudly serving the Lower Mainland and the Interior. We travel across BC for the right project&mdash;just ask!
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+        <!-- Vancouver & Lower Mainland -->
+        <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent; transition: border-color 0.3s ease, box-shadow 0.3s ease;">
+          <img src="brand_assets/Vancouver.avif" alt="Vancouver mountains" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+          <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-5">
+            <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em; line-height: 1.1;">Vancouver &amp;<br/>Lower Mainland</h3>
+          </div>
+        </div>
+
+        <!-- North Vancouver -->
+        <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent; transition: border-color 0.3s ease, box-shadow 0.3s ease;">
+          <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80" alt="North Vancouver forest" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+          <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-5">
+            <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">North Vancouver</h3>
+          </div>
+        </div>
+
+        <!-- Whistler -->
+        <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent; transition: border-color 0.3s ease, box-shadow 0.3s ease;">
+          <img src="brand_assets/Whistler.jpg" alt="Whistler alpine landscape" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+          <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-5">
+            <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Whistler</h3>
+          </div>
+        </div>
+
+        <!-- Mission -->
+        <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent; transition: border-color 0.3s ease, box-shadow 0.3s ease;">
+          <img src="brand_assets/Mission.jpg" alt="Mission forest" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+          <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-5">
+            <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Mission</h3>
+          </div>
+        </div>
+
+        <!-- Abbotsford -->
+        <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent; transition: border-color 0.3s ease, box-shadow 0.3s ease;">
+          <img src="brand_assets/Abbotsford.jpg" alt="Abbotsford valley" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+          <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-5">
+            <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Abbotsford</h3>
+          </div>
+        </div>
+
+        <!-- Chilliwack -->
+        <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent; transition: border-color 0.3s ease, box-shadow 0.3s ease;">
+          <img src="brand_assets/PortCoquitlam.jpg" alt="Chilliwack landscape" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+          <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-5">
+            <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Chilliwack</h3>
+          </div>
+        </div>
+
+        <!-- Hope -->
+        <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent; transition: border-color 0.3s ease, box-shadow 0.3s ease;">
+          <img src="brand_assets/Hope.jpg" alt="Hope mountain landscape" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+          <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-5">
+            <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Hope</h3>
+          </div>
+        </div>
+
+        <!-- Merritt -->
+        <div class="area-card relative overflow-hidden cursor-pointer" style="height: 240px; border: 2px solid transparent; transition: border-color 0.3s ease, box-shadow 0.3s ease;">
+          <img src="brand_assets/Merritt.jpg" alt="Merritt grasslands" class="area-img absolute inset-0 w-full h-full object-cover" style="transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);" />
+          <div class="absolute inset-0" style="background: rgba(0,0,0,0.38);"></div>
+          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-5">
+            <h3 class="font-heading text-white" style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em;">Merritt</h3>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom contact bar -->
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 py-5 px-8" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
+        <span style="font-size: 1.1rem;">📍</span>
+        <p class="text-white/60 text-center sm:text-left" style="font-size: 0.95rem; font-weight: 300; line-height: 1.5;">
+          Don't see your area?
+          <a href="#contact" style="color: #f28c28; font-weight: 500; text-decoration: none; transition: opacity 0.2s ease;" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">Contact us</a>
+          &mdash; we travel anywhere in BC for the right project.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════ STATS / ABOUT ═══════════════ -->
+  <section id="about" class="py-28 px-6 lg:px-12 relative overflow-hidden" style="background: #161616;">
+    <div class="absolute inset-0 topo-lines opacity-50"></div>
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(242,140,40,0.05) 0%, transparent 70%);"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+
+      <!-- Left: About copy -->
+      <div>
+        <p class="section-label mb-4">About Apex Terrain</p>
+        <h2 class="font-heading text-white mb-6" style="font-size: clamp(2.2rem, 4vw, 3.5rem); line-height: 1.05;">Built for the Terrain<br />Others <span style="color: #f28c28;">Walk Away From</span></h2>
+        <p class="text-white/55 mb-5" style="line-height: 1.8; font-weight: 300;">
+          Apex Terrain Management was founded on one principle: bring professional-grade equipment and expertise to the toughest land management jobs in British Columbia. From steep hillsides to sensitive ecosystems, we have the machines and the knowledge to deliver.
+        </p>
+        <p class="text-white/55 mb-8" style="line-height: 1.8; font-weight: 300;">
+          Our team combines hands-on field experience with modern mulching technology to ensure every project is completed safely, efficiently, and to the highest environmental standard.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <div class="flex items-center gap-3 px-4 py-3" style="background: rgba(242,140,40,0.08); border: 1px solid rgba(242,140,40,0.2);">
+            <div style="width: 6px; height: 6px; background: #f28c28; border-radius: 50%; flex-shrink: 0;"></div>
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7);">WorkSafe BC Compliant</span>
+          </div>
+          <div class="flex items-center gap-3 px-4 py-3" style="background: rgba(242,140,40,0.08); border: 1px solid rgba(242,140,40,0.2);">
+            <div style="width: 6px; height: 6px; background: #f28c28; border-radius: 50%; flex-shrink: 0;"></div>
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7);">Environmental Stewardship</span>
+          </div>
+          <div class="flex items-center gap-3 px-4 py-3" style="background: rgba(242,140,40,0.08); border: 1px solid rgba(242,140,40,0.2);">
+            <div style="width: 6px; height: 6px; background: #f28c28; border-radius: 50%; flex-shrink: 0;"></div>
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7);">Fully Insured Operations</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Stats grid -->
+      <div class="grid grid-cols-2 gap-px" style="border: 1px solid rgba(255,255,255,0.06);">
+        <div class="p-10" style="background: #1e1e1e; border-right: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06);">
+          <div class="stat-num">50<span style="color: rgba(242,140,40,0.6);">+</span></div>
+          <p class="font-heading-md text-white/50 mt-2" style="font-size: 0.85rem; letter-spacing: 0.08em;">Projects Completed</p>
+        </div>
+        <div class="p-10" style="background: #1e1e1e; border-bottom: 1px solid rgba(255,255,255,0.06);">
+          <div class="stat-num">10<span style="color: rgba(242,140,40,0.6);">+</span></div>
+          <p class="font-heading-md text-white/50 mt-2" style="font-size: 0.85rem; letter-spacing: 0.08em;">Years Experience</p>
+        </div>
+        <div class="p-10" style="background: #1e1e1e; border-right: 1px solid rgba(255,255,255,0.06);">
+          <div class="stat-num" style="font-size: clamp(2rem, 3.5vw, 3rem); line-height: 1.1;">Trusted<br/><span style="color: #f28c28;">Expertise</span></div>
+          <p class="font-heading-md text-white/50 mt-2" style="font-size: 0.85rem; letter-spacing: 0.08em;">Commitment to Quality</p>
+        </div>
+        <div class="p-10" style="background: #1e1e1e;">
+          <div class="stat-num">48<span style="color: rgba(242,140,40,0.6);">hr</span></div>
+          <p class="font-heading-md text-white/50 mt-2" style="font-size: 0.85rem; letter-spacing: 0.08em;">Response Time</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════ PROCESS ═══════════════ -->
+  <section id="process" class="py-28 px-6 lg:px-12">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <p class="section-label mb-4">How It Works</p>
+        <h2 class="font-heading text-white" style="font-size: clamp(2.5rem, 5vw, 4rem);">Our Simple Process</h2>
+        <div class="mt-4 mx-auto" style="width: 60px; height: 3px; background: #f28c28;"></div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- Step 1 -->
+        <div class="relative flex flex-col gap-5">
+          <div class="flex items-center gap-4 mb-2">
+            <div class="w-12 h-12 flex items-center justify-center flex-shrink-0" style="background: #f28c28; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.4rem; color: #1a1a1a; clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));">01</div>
+            <div class="flex-1 h-px hidden lg:block" style="background: linear-gradient(90deg, rgba(242,140,40,0.5) 0%, rgba(242,140,40,0.1) 100%);"></div>
+          </div>
+          <h3 class="font-heading text-white" style="font-size: 1.4rem;">Site Assessment</h3>
+          <p class="text-white/50" style="line-height: 1.75; font-size: 0.9rem; font-weight: 300;">We visit your site, assess terrain conditions, access constraints, and project scope — no charge, no obligation.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="flex flex-col gap-5">
+          <div class="flex items-center gap-4 mb-2">
+            <div class="w-12 h-12 flex items-center justify-center flex-shrink-0" style="background: #f28c28; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.4rem; color: #1a1a1a; clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));">02</div>
+            <div class="flex-1 h-px hidden lg:block" style="background: linear-gradient(90deg, rgba(242,140,40,0.5) 0%, rgba(242,140,40,0.1) 100%);"></div>
+          </div>
+          <h3 class="font-heading text-white" style="font-size: 1.4rem;">Custom Quote</h3>
+          <p class="text-white/50" style="line-height: 1.75; font-size: 0.9rem; font-weight: 300;">Receive a transparent, itemized quote tailored to your project's unique requirements — no hidden fees.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="flex flex-col gap-5">
+          <div class="flex items-center gap-4 mb-2">
+            <div class="w-12 h-12 flex items-center justify-center flex-shrink-0" style="background: #f28c28; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.4rem; color: #1a1a1a; clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));">03</div>
+            <div class="flex-1 h-px hidden lg:block" style="background: linear-gradient(90deg, rgba(242,140,40,0.5) 0%, rgba(242,140,40,0.1) 100%);"></div>
+          </div>
+          <h3 class="font-heading text-white" style="font-size: 1.4rem;">We Get to Work</h3>
+          <p class="text-white/50" style="line-height: 1.75; font-size: 0.9rem; font-weight: 300;">Our crew mobilizes with the right equipment for your terrain and executes efficiently while respecting your property.</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="flex flex-col gap-5">
+          <div class="flex items-center gap-4 mb-2">
+            <div class="w-12 h-12 flex items-center justify-center flex-shrink-0" style="background: #f28c28; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.4rem; color: #1a1a1a; clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));">04</div>
+          </div>
+          <h3 class="font-heading text-white" style="font-size: 1.4rem;">Clean Handover</h3>
+          <p class="text-white/50" style="line-height: 1.75; font-size: 0.9rem; font-weight: 300;">Site walkthrough, documentation, and a clean handover — leaving your land ready for its next chapter.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ TESTIMONIALS ═══════════════ -->
+  <section id="testimonials" class="py-28 px-6 lg:px-12 relative" style="background: #161616;">
+    <div class="absolute inset-0 topo-lines opacity-30"></div>
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse 50% 60% at 20% 50%, rgba(242,140,40,0.04) 0%, transparent 70%);"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <p class="section-label mb-4">Client Reviews</p>
+        <h2 class="font-heading text-white" style="font-size: clamp(2.5rem, 5vw, 4rem);">Trusted by BC Property Owners</h2>
+        <div class="mt-4 mx-auto" style="width: 60px; height: 3px; background: #f28c28;"></div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+
+        <div class="testimonial-card p-8 flex flex-col gap-6">
+          <div class="flex gap-1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="text-white/65 flex-1" style="line-height: 1.8; font-size: 0.95rem; font-weight: 300; font-style: italic;">"Apex tackled our steep hillside property that two other contractors refused to quote. The job was done in two days — clean, professional, exactly what we needed for our fire interface plan."</p>
+          <div class="border-t border-white/10 pt-5 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-sm flex items-center justify-center font-heading-md text-sm" style="background: rgba(242,140,40,0.2); color: #f28c28;">JM</div>
+            <div>
+              <p class="font-heading-md text-white" style="font-size: 0.9rem;">James M.</p>
+              <p class="text-white/40" style="font-size: 0.78rem;">Coquitlam, BC</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card p-8 flex flex-col gap-6" style="border-color: rgba(242,140,40,0.2);">
+          <div class="flex gap-1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="text-white/65 flex-1" style="line-height: 1.8; font-size: 0.95rem; font-weight: 300; font-style: italic;">"Called Apex after the November storms hit our acreage hard. They were on-site within 48 hours and completely cleared the fallen trees and debris. Fantastic communication throughout."</p>
+          <div class="border-t border-white/10 pt-5 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-sm flex items-center justify-center font-heading-md text-sm" style="background: rgba(242,140,40,0.2); color: #f28c28;">SR</div>
+            <div>
+              <p class="font-heading-md text-white" style="font-size: 0.9rem;">Sarah R.</p>
+              <p class="text-white/40" style="font-size: 0.78rem;">Mission, BC</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card p-8 flex flex-col gap-6">
+          <div class="flex gap-1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="text-white/65 flex-1" style="line-height: 1.8; font-size: 0.95rem; font-weight: 300; font-style: italic;">"We hired Apex for clearing a new development site. Their team was efficient, safe, and left the site in better shape than we expected. Would absolutely hire again for our next project."</p>
+          <div class="border-t border-white/10 pt-5 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-sm flex items-center justify-center font-heading-md text-sm" style="background: rgba(242,140,40,0.2); color: #f28c28;">DT</div>
+            <div>
+              <p class="font-heading-md text-white" style="font-size: 0.9rem;">Derek T.</p>
+              <p class="text-white/40" style="font-size: 0.78rem;">Chilliwack, BC</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ CTA BANNER ═══════════════ -->
+  <section class="py-20 px-6 lg:px-12 relative overflow-hidden" style="background: #f28c28;">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse 80% 100% at 100% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);"></div>
+    <div class="absolute inset-0 topo-lines" style="opacity: 0.08;"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
+      <div>
+        <h2 class="font-heading text-anthracite" style="font-size: clamp(2rem, 4vw, 3.2rem); color: #1a1a1a;">Ready to Transform Your Land?</h2>
+        <p class="mt-2" style="color: rgba(26,26,26,0.7); font-weight: 300; font-size: 1rem;">Get your free, no-obligation site assessment today.</p>
+      </div>
+      <a href="#contact" style="display: inline-flex; align-items: center; gap: 8px; background: #1a1a1a; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 36px; text-decoration: none; flex-shrink: 0; transition: background 0.2s ease, transform 0.15s cubic-bezier(0.34,1.56,0.64,1); clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));"
+         onmouseover="this.style.background='#2a2a2a'; this.style.transform='translateY(-2px)'"
+         onmouseout="this.style.background='#1a1a1a'; this.style.transform='translateY(0)'">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Book a Free Quote
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════════════ FAQ ═══════════════ -->
+  <section id="faq" class="py-24 px-6 lg:px-12 relative overflow-hidden" style="background: #0f0f0f;">
+    <div class="absolute inset-0 topo-lines opacity-25 pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-5xl mx-auto">
+
+      <!-- Header -->
+      <div class="text-center mb-14">
+        <p class="section-label mb-4">Got Questions?</p>
+        <h2 class="font-heading text-white" style="font-size: clamp(2.6rem, 5.5vw, 4.5rem); letter-spacing: -0.01em; line-height: 1; white-space: nowrap;">FREQUENTLY ASKED <span style="color: #f28c28;">QUESTIONS</span></h2>
+        <p class="mt-5 mx-auto" style="color: rgba(255,255,255,0.45); font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 300; line-height: 1.7; max-width: 520px;">Everything you need to know before getting started with Apex Terrain Management.</p>
+      </div>
+
+      <!-- Accordion -->
+      <div class="flex flex-col" style="gap: 12px;" id="faq-list">
+
+        <!-- Q1 -->
+        <div class="faq-item" style="background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.35);">
+          <button class="faq-trigger w-full flex items-center justify-between px-7 py-5 text-left" style="background: none; border: none; cursor: pointer;" aria-expanded="false">
+            <span style="font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 700; color: #1a1a1a;">Do you offer free estimates?</span>
+            <span class="faq-icon flex items-center justify-center flex-shrink-0" style="width: 34px; height: 34px; border-radius: 50%; background: #f28c28; margin-left: 20px; transition: transform 0.3s ease;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-body" style="display: none; padding: 0 28px 24px;">
+            <p style="font-family: 'Roboto', sans-serif; font-size: 0.93rem; color: #444; line-height: 1.75; font-weight: 300;">Yes, absolutely. We'll visit your property in person, assess the area, and provide a clear estimate at no cost. During the visit, we'll also walk you through what work is essential and what's optional — so you can make informed decisions with confidence.</p>
+            <a href="#contact" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; color: #f28c28; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: gap 0.2s ease;" onmouseover="this.style.gap='10px'" onmouseout="this.style.gap='6px'">
+              Request your free estimate
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="faq-item" style="background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.35);">
+          <button class="faq-trigger w-full flex items-center justify-between px-7 py-5 text-left" style="background: none; border: none; cursor: pointer;" aria-expanded="false">
+            <span style="font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 700; color: #1a1a1a;">Can your machines handle extremely steep or narrow access terrain?</span>
+            <span class="faq-icon flex items-center justify-center flex-shrink-0" style="width: 34px; height: 34px; border-radius: 50%; background: #f28c28; margin-left: 20px; transition: transform 0.3s ease;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-body" style="display: none; padding: 0 28px 24px;">
+            <p style="font-family: 'Roboto', sans-serif; font-size: 0.93rem; color: #444; line-height: 1.75; font-weight: 300;">Yes. We specialize in "Tight Access &amp; Steep Terrain." Our specialized equipment is designed to operate safely and efficiently on high-gradient slopes and in confined spaces where standard machinery cannot reach.</p>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="faq-item" style="background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.35);">
+          <button class="faq-trigger w-full flex items-center justify-between px-7 py-5 text-left" style="background: none; border: none; cursor: pointer;" aria-expanded="false">
+            <span style="font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 700; color: #1a1a1a;">Is mulching environmentally friendly?</span>
+            <span class="faq-icon flex items-center justify-center flex-shrink-0" style="width: 34px; height: 34px; border-radius: 50%; background: #f28c28; margin-left: 20px; transition: transform 0.3s ease;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-body" style="display: none; padding: 0 28px 24px;">
+            <p style="font-family: 'Roboto', sans-serif; font-size: 0.93rem; color: #444; line-height: 1.75; font-weight: 300;">Absolutely. Mulching is a sustainable land-clearing method that returns nutrients to the soil and helps prevent erosion. Unlike burning or hauling, it leaves a protective layer that suppresses weeds and protects the ecosystem.</p>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="faq-item" style="background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.35);">
+          <button class="faq-trigger w-full flex items-center justify-between px-7 py-5 text-left" style="background: none; border: none; cursor: pointer;" aria-expanded="false">
+            <span style="font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 700; color: #1a1a1a;">How soon can you start my project?</span>
+            <span class="faq-icon flex items-center justify-center flex-shrink-0" style="width: 34px; height: 34px; border-radius: 50%; background: #f28c28; margin-left: 20px; transition: transform 0.3s ease;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-body" style="display: none; padding: 0 28px 24px;">
+            <p style="font-family: 'Roboto', sans-serif; font-size: 0.93rem; color: #444; line-height: 1.75; font-weight: 300;">We typically respond to all inquiries within two business days. Depending on the season and project scale, we can often mobilize to your site within 1–2 weeks of a signed agreement.</p>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="faq-item" style="background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.35);">
+          <button class="faq-trigger w-full flex items-center justify-between px-7 py-5 text-left" style="background: none; border: none; cursor: pointer;" aria-expanded="false">
+            <span style="font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 700; color: #1a1a1a;">Are you fully insured and WorkSafe BC compliant?</span>
+            <span class="faq-icon flex items-center justify-center flex-shrink-0" style="width: 34px; height: 34px; border-radius: 50%; background: #f28c28; margin-left: 20px; transition: transform 0.3s ease;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-body" style="display: none; padding: 0 28px 24px;">
+            <p style="font-family: 'Roboto', sans-serif; font-size: 0.93rem; color: #444; line-height: 1.75; font-weight: 300;">Yes. Safety and professional integrity are our top priorities. Apex Terrain is fully insured for all operations and maintains strict WorkSafe BC compliance to protect our team and your property.</p>
+          </div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="faq-item" style="background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.35);">
+          <button class="faq-trigger w-full flex items-center justify-between px-7 py-5 text-left" style="background: none; border: none; cursor: pointer;" aria-expanded="false">
+            <span style="font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 700; color: #1a1a1a;">What types of properties do you work on?</span>
+            <span class="faq-icon flex items-center justify-center flex-shrink-0" style="width: 34px; height: 34px; border-radius: 50%; background: #f28c28; margin-left: 20px; transition: transform 0.3s ease;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-body" style="display: none; padding: 0 28px 24px;">
+            <p style="font-family: 'Roboto', sans-serif; font-size: 0.93rem; color: #444; line-height: 1.75; font-weight: 300;">We work on residential properties, acreages, commercial sites, and rural land. Whether it's a backyard project or a larger piece of land, we have the equipment and experience to help.</p>
+          </div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="faq-item" style="background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.35);">
+          <button class="faq-trigger w-full flex items-center justify-between px-7 py-5 text-left" style="background: none; border: none; cursor: pointer;" aria-expanded="false">
+            <span style="font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 700; color: #1a1a1a;">How far in advance should I schedule?</span>
+            <span class="faq-icon flex items-center justify-center flex-shrink-0" style="width: 34px; height: 34px; border-radius: 50%; background: #f28c28; margin-left: 20px; transition: transform 0.3s ease;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-body" style="display: none; padding: 0 28px 24px;">
+            <p style="font-family: 'Roboto', sans-serif; font-size: 0.93rem; color: #444; line-height: 1.75; font-weight: 300;">We recommend booking as early as possible, especially during peak seasons. That said, we'll always do our best to accommodate your timeline — reach out and we'll find a solution that works for you.</p>
+            <a href="#contact" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; color: #f28c28; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: gap 0.2s ease;" onmouseover="this.style.gap='10px'" onmouseout="this.style.gap='6px'">
+              Get in touch today
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ CONTACT ═══════════════ -->
+  <section id="contact" class="relative overflow-hidden" style="background: #141414;">
+    <div class="absolute inset-0 topo-lines opacity-30 pointer-events-none"></div>
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse 70% 90% at 20% 60%, rgba(242,140,40,0.06) 0%, transparent 65%);"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-24 grid lg:grid-cols-2 gap-16 items-start">
+
+      <!-- Left: Value props + Contact -->
+      <div class="lg:pt-4">
+        <p class="section-label mb-5">Get Started</p>
+        <h2 class="font-heading text-white leading-none mb-6" style="font-size: clamp(3.5rem, 7vw, 6rem); letter-spacing: -0.02em; line-height: 0.95;">FREE <span style="color: #f28c28;">QUOTE</span></h2>
+        <p class="mb-8" style="color: rgba(255,255,255,0.5); line-height: 1.75; font-weight: 300; font-size: 1rem; max-width: 420px;">Submit your project details for a professional consultation. We provide straightforward solutions for the most challenging terrain.</p>
+
+        <ul class="flex flex-col mb-8" style="gap: 13px;">
+          <li class="flex items-start gap-3" style="font-family: 'Roboto', sans-serif; font-size: 0.9rem;">
+            <span style="color: #f28c28; font-size: 0.55rem; flex-shrink: 0; margin-top: 5px;">▲</span>
+            <span style="color: rgba(255,255,255,0.85);"><strong style="color: #fff; font-weight: 600;">Free Estimates</strong> <span style="color: rgba(255,255,255,0.45);">—</span> <span style="color: rgba(255,255,255,0.55); font-weight: 300;">Complimentary for the Lower Mainland (North Van to Hope).</span></span>
+          </li>
+          <li class="flex items-start gap-3" style="font-family: 'Roboto', sans-serif; font-size: 0.9rem;">
+            <span style="color: #f28c28; font-size: 0.55rem; flex-shrink: 0; margin-top: 5px;">▲</span>
+            <span><strong style="color: #fff; font-weight: 600;">Priority Response</strong> <span style="color: rgba(255,255,255,0.45);">—</span> <span style="color: rgba(255,255,255,0.55); font-weight: 300;">Feedback within two business days.</span></span>
+          </li>
+          <li class="flex items-start gap-3" style="font-family: 'Roboto', sans-serif; font-size: 0.9rem;">
+            <span style="color: #f28c28; font-size: 0.55rem; flex-shrink: 0; margin-top: 5px;">▲</span>
+            <span><strong style="color: #fff; font-weight: 600;">Project Integrity</strong> <span style="color: rgba(255,255,255,0.45);">—</span> <span style="color: rgba(255,255,255,0.55); font-weight: 300;">No hidden costs; honest, fixed-rate pricing.</span></span>
+          </li>
+          <li class="flex items-start gap-3" style="font-family: 'Roboto', sans-serif; font-size: 0.9rem;">
+            <span style="color: #f28c28; font-size: 0.55rem; flex-shrink: 0; margin-top: 5px;">▲</span>
+            <span><strong style="color: #fff; font-weight: 600;">Technical Precision</strong> <span style="color: rgba(255,255,255,0.45);">—</span> <span style="color: rgba(255,255,255,0.55); font-weight: 300;">Specialized equipment operated by local experts.</span></span>
+          </li>
+          <li class="flex items-start gap-3" style="font-family: 'Roboto', sans-serif; font-size: 0.9rem;">
+            <span style="color: #f28c28; font-size: 0.55rem; flex-shrink: 0; margin-top: 5px;">▲</span>
+            <span><strong style="color: #fff; font-weight: 600;">Professional Standards</strong> <span style="color: rgba(255,255,255,0.45);">—</span> <span style="color: rgba(255,255,255,0.55); font-weight: 300;">Dependable service with an elevated client experience.</span></span>
+          </li>
+          <li class="flex items-start gap-3" style="font-family: 'Roboto', sans-serif; font-size: 0.9rem;">
+            <span style="color: #f28c28; font-size: 0.55rem; flex-shrink: 0; margin-top: 5px;">▲</span>
+            <span><strong style="color: #fff; font-weight: 600;">Expansive Coverage</strong> <span style="color: rgba(255,255,255,0.45);">—</span> <span style="color: rgba(255,255,255,0.55); font-weight: 300;">Strategic operations from Vancouver to Merritt.</span></span>
+          </li>
+        </ul>
+
+        <!-- Home base line -->
+        <p style="font-family: 'Roboto', sans-serif; font-size: 0.85rem; color: rgba(255,255,255,0.6); font-weight: 400; line-height: 1.6; padding: 14px 16px; border-left: 2px solid #f28c28; background: rgba(242,140,40,0.05); margin-bottom: 32px;">
+          <strong style="color: #fff; font-weight: 500;">Proudly serving British Columbia, Canada.</strong> Our home base is located in Mission, BC.
+        </p>
+
+        <!-- Contact details -->
+        <div class="flex flex-col" style="gap: 18px;">
+          <a href="tel:+16040001234" class="flex items-center gap-4" style="text-decoration: none;">
+            <div class="flex items-center justify-center flex-shrink-0" style="width: 44px; height: 44px; background: rgba(242,140,40,0.12); border: 1px solid rgba(242,140,40,0.25); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(242,140,40,0.22)'" onmouseout="this.style.background='rgba(242,140,40,0.12)'">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 13.5 19.79 19.79 0 01.1 4.9 2 2 0 012.07 2.72h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+            </div>
+            <div>
+              <p style="font-family: 'Roboto', sans-serif; font-size: 0.7rem; letter-spacing: 0.12em; color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 2px;">Call Us</p>
+              <p style="font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 600; color: #fff; letter-spacing: 0.02em;">604-000-1234</p>
+            </div>
+          </a>
+
+          <a href="mailto:info@apexterrainltd.com" class="flex items-center gap-4" style="text-decoration: none;">
+            <div class="flex items-center justify-center flex-shrink-0" style="width: 44px; height: 44px; background: rgba(242,140,40,0.12); border: 1px solid rgba(242,140,40,0.25); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(242,140,40,0.22)'" onmouseout="this.style.background='rgba(242,140,40,0.12)'">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <p style="font-family: 'Roboto', sans-serif; font-size: 0.7rem; letter-spacing: 0.12em; color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 2px;">Email Us</p>
+              <p style="font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 600; color: #fff; letter-spacing: 0.02em;">info@apexterrainltd.com</p>
+            </div>
+          </a>
+
+          <div class="flex items-center gap-4">
+            <div class="flex items-center justify-center flex-shrink-0" style="width: 44px; height: 44px; background: rgba(242,140,40,0.12); border: 1px solid rgba(242,140,40,0.25);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <p style="font-family: 'Roboto', sans-serif; font-size: 0.7rem; letter-spacing: 0.12em; color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 2px;">Service Area</p>
+              <p style="font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 600; color: #fff; letter-spacing: 0.02em;">British Columbia, Canada</p>
+              <p style="font-family: 'Roboto', sans-serif; font-size: 0.78rem; color: rgba(255,255,255,0.4); font-weight: 300; margin-top: 1px;">Home base: Mission, BC</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: White form card -->
+      <div style="background: #ffffff; border-top: 4px solid #f28c28; box-shadow: 0 32px 80px rgba(0,0,0,0.5);">
+        <div id="quote-card" class="p-8 lg:p-10">
+          <h3 class="font-heading mb-7" style="font-size: 1.5rem; font-weight: 800; letter-spacing: 0.06em; color: #1a1a1a; text-transform: uppercase;">Request a Free Quote</h3>
+
+          <style>
+            .quote-label { font-family: 'Roboto', sans-serif; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #555; margin-bottom: 6px; display: block; }
+            .quote-input { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; font-family: 'Roboto', sans-serif; font-size: 0.9rem; color: #1a1a1a; background: #fff; outline: none; transition: border-color 0.2s ease; box-sizing: border-box; }
+            .quote-input::placeholder { color: #aaa; }
+            .quote-input:focus { border-color: #f28c28; }
+            .service-checkbox { display: none; }
+            .service-label { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid #d1d5db; cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #1a1a1a; transition: border-color 0.2s ease, background 0.2s ease; user-select: none; }
+            .service-label:hover { border-color: #f28c28; background: #fff8f2; }
+            .service-checkbox:checked + .service-label { border-color: #f28c28; background: #fff4e6; color: #c96f0a; }
+            .service-box { display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; border: 1.5px solid #d1d5db; flex-shrink: 0; transition: border-color 0.2s ease, background 0.2s ease; }
+            .service-checkbox:checked + .service-label .service-box { border-color: #f28c28; background: #f28c28; }
+            .service-checkbox:checked + .service-label .service-checkmark { display: block; }
+            .service-checkmark { display: none; width: 10px; height: 10px; }
+          </style>
+
+          <form id="quote-form" onsubmit="handleSubmit(event)" class="flex flex-col" style="gap: 18px;">
+            <!-- Row 1: Name -->
+            <div class="grid sm:grid-cols-2" style="gap: 14px;">
+              <div>
+                <label class="quote-label">First Name *</label>
+                <input id="q-firstname" type="text" placeholder="Jane" required class="quote-input" />
+              </div>
+              <div>
+                <label class="quote-label">Last Name *</label>
+                <input id="q-lastname" type="text" placeholder="Smith" required class="quote-input" />
+              </div>
+            </div>
+
+            <!-- Row 2: Contact -->
+            <div class="grid sm:grid-cols-2" style="gap: 14px;">
+              <div>
+                <label class="quote-label">Email Address *</label>
+                <input id="q-email" type="email" placeholder="jane@email.com" required class="quote-input" />
+              </div>
+              <div>
+                <label class="quote-label">Phone Number *</label>
+                <input id="q-phone" type="tel" placeholder="(604) 000-0000" required class="quote-input" />
+              </div>
+            </div>
+
+            <!-- Property Address -->
+            <div>
+              <label class="quote-label">Property Address *</label>
+              <input id="q-address" type="text" placeholder="Start typing your address..." required class="quote-input" />
+            </div>
+
+            <!-- Services checkboxes -->
+            <div>
+              <label class="quote-label" style="margin-bottom: 10px;">Services Required * <span style="font-size: 0.65rem; color: #999; letter-spacing: 0.05em; text-transform: none; font-weight: 400;">(select all that apply)</span></label>
+              <div class="grid sm:grid-cols-2" style="gap: 8px;">
+                <div>
+                  <input type="checkbox" id="svc-steep" name="services" value="steep" class="service-checkbox" />
+                  <label for="svc-steep" class="service-label">
+                    <span class="service-box"><svg class="service-checkmark" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    Tight Access Steep Terrain
+                  </label>
+                </div>
+                <div>
+                  <input type="checkbox" id="svc-fire" name="services" value="fire" class="service-checkbox" />
+                  <label for="svc-fire" class="service-label">
+                    <span class="service-box"><svg class="service-checkmark" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    Fire Protection
+                  </label>
+                </div>
+                <div>
+                  <input type="checkbox" id="svc-clearing" name="services" value="clearing" class="service-checkbox" />
+                  <label for="svc-clearing" class="service-label">
+                    <span class="service-box"><svg class="service-checkmark" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    Land Clearing
+                  </label>
+                </div>
+                <div>
+                  <input type="checkbox" id="svc-storm" name="services" value="storm" class="service-checkbox" />
+                  <label for="svc-storm" class="service-label">
+                    <span class="service-box"><svg class="service-checkmark" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    Storm Clean-Up
+                  </label>
+                </div>
+                <div class="sm:col-span-2">
+                  <input type="checkbox" id="svc-other" name="services" value="other" class="service-checkbox" />
+                  <label for="svc-other" class="service-label">
+                    <span class="service-box"><svg class="service-checkmark" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    Other &ndash; Please describe in details below or we can discuss on-site
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Details -->
+            <div>
+              <label class="quote-label">Additional Details <span style="font-weight: 300; text-transform: none; letter-spacing: 0;">(Optional)</span></label>
+              <textarea id="q-details" rows="4" placeholder="Tell us more about your project — property size, access constraints, timeline, etc." class="quote-input resize-none" style="resize: none;"></textarea>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" style="width: 100%; background: #f28c28; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 16px 24px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s ease, transform 0.15s cubic-bezier(0.34,1.56,0.64,1);"
+              onmouseover="this.style.background='#d97c1a'; this.style.transform='translateY(-1px)'"
+              onmouseout="this.style.background='#f28c28'; this.style.transform='translateY(0)'">
+              Submit Quote Request
+              <span style="font-size: 0.7rem;">▲</span>
+            </button>
+
+            <p style="text-align: center; font-family: 'Roboto', sans-serif; font-size: 0.78rem; color: #999; margin-top: -4px;">By submitting, you agree to be contacted by Apex Terrain Management LTD.</p>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════ FOOTER ═══════════════ -->
+  <footer style="background: #111111; border-top: 1px solid rgba(255,255,255,0.06);">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+        <div class="lg:col-span-2">
+          <img src="brand_assets/logo.png" alt="Apex Terrain Management" class="h-12 w-auto mb-4" />
+          <p class="text-white/40 max-w-xs" style="line-height: 1.75; font-size: 0.9rem; font-weight: 300;">Professional mulching, fire protection, land clearing, and storm clean-up across British Columbia.</p>
+        </div>
+        <div>
+          <p class="font-heading-md text-white mb-4" style="font-size: 0.8rem; letter-spacing: 0.14em;">SERVICES</p>
+          <ul class="flex flex-col gap-2">
+            <li><a href="#services" class="text-white/40 hover:text-orange transition-colors" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Tight Access Mulching</a></li>
+            <li><a href="#services" class="text-white/40 hover:text-orange" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Fire Protection</a></li>
+            <li><a href="#services" class="text-white/40" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Land Clearing</a></li>
+            <li><a href="#services" class="text-white/40" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Storm Clean-Up</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="font-heading-md text-white mb-4" style="font-size: 0.8rem; letter-spacing: 0.14em;">COMPANY</p>
+          <ul class="flex flex-col gap-2">
+            <li><a href="#about" class="text-white/40" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">About Us</a></li>
+            <li><a href="#process" class="text-white/40" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Our Process</a></li>
+            <li><a href="#testimonials" class="text-white/40" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Reviews</a></li>
+            <li><a href="#contact" class="text-white/40" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-white/06 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4" style="border-top: 1px solid rgba(255,255,255,0.06);">
+        <p class="text-white/25" style="font-size: 0.8rem; font-weight: 300;">© 2026 Apex Terrain Management Ltd. All rights reserved.</p>
+        <p class="text-white/25" style="font-size: 0.8rem; font-weight: 300;">British Columbia, Canada</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Nav scroll effect
+    const nav = document.getElementById('main-nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    // Mobile menu
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    let menuOpen = false;
+    menuBtn.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      mobileMenu.classList.toggle('hidden', !menuOpen);
+    });
+    function closeMobileMenu() {
+      menuOpen = false;
+      mobileMenu.classList.add('hidden');
+    }
+
+    // Form submit
+    // FAQ accordion
+    document.querySelectorAll('.faq-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const item = trigger.closest('.faq-item');
+        const body = item.querySelector('.faq-body');
+        const icon = trigger.querySelector('.faq-icon');
+        const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+
+        // Close all others
+        document.querySelectorAll('.faq-item').forEach(other => {
+          if (other !== item) {
+            other.querySelector('.faq-body').style.display = 'none';
+            other.querySelector('.faq-trigger').setAttribute('aria-expanded', 'false');
+            other.querySelector('.faq-icon').style.transform = 'rotate(0deg)';
+          }
+        });
+
+        if (isOpen) {
+          body.style.display = 'none';
+          trigger.setAttribute('aria-expanded', 'false');
+          icon.style.transform = 'rotate(0deg)';
+        } else {
+          body.style.display = 'block';
+          trigger.setAttribute('aria-expanded', 'true');
+          icon.style.transform = 'rotate(45deg)';
+        }
+      });
+    });
+
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbw46QIvHLD8GdkOoCwOrUEcwsV1YYgkrkdmqMRvGZXoZYde1K0zNa2EtS-xYt55NSAd3w/exec';
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      const form = e.target;
+      const btn = form.querySelector('button[type="submit"]');
+
+      const checked = [...form.querySelectorAll('input[name="services"]:checked')];
+      const serviceLabels = {
+        steep: 'Tight Access Steep Terrain',
+        fire: 'Fire Protection',
+        clearing: 'Land Clearing',
+        storm: 'Storm Clean-Up',
+        other: 'Other'
+      };
+      const services = checked.map(cb => serviceLabels[cb.value] || cb.value).join(', ');
+
+      const payload = {
+        firstName: document.getElementById('q-firstname').value.trim(),
+        lastName:  document.getElementById('q-lastname').value.trim(),
+        email:     document.getElementById('q-email').value.trim(),
+        phone:     document.getElementById('q-phone').value.trim(),
+        address:   document.getElementById('q-address').value.trim(),
+        services:  services,
+        details:   document.getElementById('q-details').value.trim()
+      };
+
+      // Loading state
+      btn.disabled = true;
+      btn.innerHTML = 'Submitting&hellip;';
+      btn.style.background = '#c97520';
+
+      try {
+        await fetch(SHEET_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        // Replace card content with success state
+        document.getElementById('quote-card').innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 24px;min-height:420px;">
+            <div style="width:72px;height:72px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;margin-bottom:28px;">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.7rem;font-weight:800;letter-spacing:0.04em;color:#1a1a1a;text-transform:uppercase;margin-bottom:16px;">Request Received!</h3>
+            <p style="font-family:'Roboto',sans-serif;font-size:0.97rem;color:#555;line-height:1.75;font-weight:300;max-width:340px;margin-bottom:24px;">
+              Thank you! Your request has been sent. We will contact you within <strong style="color:#1a1a1a;font-weight:600;">48 hours</strong> to schedule your on-site assessment.
+            </p>
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:#fff8f2;border:1px solid rgba(242,140,40,0.3);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <span style="font-family:'Roboto',sans-serif;font-size:0.82rem;color:#888;font-weight:300;">A confirmation email is on its way to <strong style="color:#555;font-weight:500;">${payload.email}</strong></span>
+            </div>
+          </div>`;
+
+      } catch (err) {
+        btn.innerHTML = 'Something went wrong — try again';
+        btn.style.background = '#c0392b';
+        btn.disabled = false;
+        setTimeout(() => {
+          btn.innerHTML = 'Submit Quote Request <span style="font-size:0.7rem;">▲</span>';
+          btn.style.background = '#f28c28';
+        }, 4000);
+      }
+    }
+
+    // Google Places Autocomplete on the property address field
+    function initAutocomplete() {
+      const input = document.getElementById('q-address');
+      if (!input) return;
+
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['address'],
+        componentRestrictions: { country: 'ca' },
+        fields: ['formatted_address']
+      });
+
+      // When a suggestion is selected, fill the input with the clean formatted address
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place.formatted_address) {
+          input.value = place.formatted_address;
+        }
+      });
+
+      // Style the Google autocomplete dropdown to match the form
+      const style = document.createElement('style');
+      style.textContent = `
+        .pac-container {
+          font-family: 'Roboto', sans-serif;
+          font-size: 0.88rem;
+          border: 1px solid #f28c28;
+          border-top: none;
+          border-radius: 0 0 4px 4px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+          margin-top: -1px;
+        }
+        .pac-item {
+          padding: 9px 14px;
+          cursor: pointer;
+          border-top: 1px solid #f0f0f0;
+          color: #1a1a1a;
+          line-height: 1.4;
+        }
+        .pac-item:hover, .pac-item-selected {
+          background: #fff8f2;
+        }
+        .pac-item-query {
+          font-size: 0.88rem;
+          color: #1a1a1a;
+          font-weight: 500;
+        }
+        .pac-matched { color: #f28c28; font-weight: 600; }
+        .pac-icon { display: none; }
+        .pac-logo:after { display: none; }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Service area card hover — image zoom + orange border
+    document.querySelectorAll('.area-card').forEach(card => {
+      const img = card.querySelector('.area-img');
+      card.addEventListener('mouseenter', () => {
+        card.style.borderColor = 'rgba(242,140,40,0.7)';
+        card.style.boxShadow = '0 0 0 2px rgba(242,140,40,0.2), 0 12px 40px rgba(0,0,0,0.6)';
+        if (img) img.style.transform = 'scale(1.08)';
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.borderColor = 'transparent';
+        card.style.boxShadow = 'none';
+        if (img) img.style.transform = 'scale(1)';
+      });
+    });
+
+    // Fade-in on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(el => {
+        if (el.isIntersecting) {
+          el.target.style.opacity = '1';
+          el.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.service-card, .testimonial-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(24px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s ease, box-shadow 0.25s ease';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
