@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiQHMuQAv_DXH5U27PKSOyqTxCuxMLySI&libraries=places&callback=initAutocomplete" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiQHMuQAv_DXH5U27PKSOyqTxCuxMLySI&libraries=places&v=weekly&callback=initAutocomplete" async defer></script>
 
   <script>
     tailwind.config = {
@@ -102,13 +102,61 @@
 
     /* Service cards */
     .service-card {
-      background: #222222; border: 1px solid rgba(255,255,255,0.06);
-      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s ease, box-shadow 0.25s ease;
+      background: #1a1a1a;
+      background-size: cover;
+      background-position: center;
       position: relative; overflow: hidden;
+      min-height: 500px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
     }
-    .service-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(242,140,40,0.04) 0%, transparent 60%); opacity: 0; transition: opacity 0.25s ease; }
-    .service-card:hover { transform: translateY(-6px); border-color: rgba(242,140,40,0.4); box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(242,140,40,0.15); }
-    .service-card:hover::before { opacity: 1; }
+    .service-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.15) 100%);
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+    .service-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(242,140,40,0.08) 0%, transparent 55%);
+      opacity: 0; transition: opacity 0.3s ease;
+      z-index: 2;
+    }
+    .service-card:hover { transform: scale(1.015); }
+    .service-card:hover::after { opacity: 1; }
+    .service-card:hover .sc-img { transform: scale(1.06); }
+    .sc-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .sc-content { position: relative; z-index: 3; padding: 2rem; }
+    .sc-num {
+      position: absolute; top: 1.25rem; right: 1.5rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 5.5rem; font-weight: 800; line-height: 1;
+      color: rgba(255,255,255,0.06); letter-spacing: -0.03em;
+      user-select: none; z-index: 3;
+    }
+    .sc-icon { font-size: 2.5rem; margin-bottom: 14px; display: block; }
+    .sc-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      color: #fff; margin-bottom: 10px; line-height: 1.15;
+    }
+    .sc-desc { color: rgba(255,255,255,0.6); font-size: 0.875rem; line-height: 1.7; font-weight: 300; margin-bottom: 1.25rem; }
+    .sc-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: #f28c28; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; text-decoration: none;
+      transition: gap 0.2s ease;
+    }
+    .sc-cta:hover { gap: 14px; }
 
     /* Stat items */
     .stat-num {
@@ -271,81 +319,70 @@
         <div class="mt-4 mx-auto" style="width: 60px; height: 3px; background: #f28c28;"></div>
       </div>
 
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid sm:grid-cols-2 gap-4">
 
-        <!-- Tight Access Mulching -->
-        <div class="service-card p-8 flex flex-col gap-6">
-          <div class="w-14 h-14 flex items-center justify-center rounded-sm" style="background: rgba(242,140,40,0.1); border: 1px solid rgba(242,140,40,0.25);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8">
-              <path d="M12 22v-7"/>
-              <path d="M9 15h6"/>
-              <path d="M7 11l5-7 5 7H7z"/>
-              <path d="M5 15l7-10 7 10H5z"/>
-              <path d="M3 19h18"/>
-            </svg>
+        <!-- 01 Tight Access Mulching -->
+        <div class="service-card">
+          <!-- SWAP PHOTO: replace src with your Tight Access Mulching job photo -->
+          <img class="sc-img" src="brand_assets/Whistler.jpg" alt="Tight access mulching on steep terrain">
+          <div class="sc-num">01</div>
+          <div class="sc-content">
+            <span class="sc-icon">🌿</span>
+            <h3 class="sc-title">Tight Access<br>Mulching</h3>
+            <p class="sc-desc">Specialized equipment and technique to access and mulch terrain where standard machines simply cannot operate — steep slopes, narrow corridors, confined spaces.</p>
+            <a href="#contact" class="sc-cta">
+              Get a Quote
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
           </div>
-          <div>
-            <h3 class="font-heading text-white mb-3" style="font-size: 1.5rem;">Tight Access<br />Steep Terrain</h3>
-            <p class="text-white/50" style="line-height: 1.7; font-size: 0.9rem; font-weight: 300;">Specialized equipment and technique to access and mulch terrain where standard machines simply cannot operate.</p>
-          </div>
-          <a href="#contact" class="mt-auto text-orange font-heading-md text-sm flex items-center gap-2" style="color: #f28c28; transition: gap 0.2s ease;" onmouseover="this.style.gap='10px'" onmouseout="this.style.gap='8px'">
-            Learn More
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
         </div>
 
-        <!-- Fire Protection -->
-        <div class="service-card p-8 flex flex-col gap-6">
-          <div class="w-14 h-14 flex items-center justify-center rounded-sm" style="background: rgba(242,140,40,0.1); border: 1px solid rgba(242,140,40,0.25);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8">
-              <path d="M8.5 14.5A2.5 2.5 0 0011 17c0 1.38-1.12 2.5-2.5 2.5S6 18.38 6 17c0-1 .5-2 1.5-2.5"/>
-              <path d="M12 2c0 0-6 4.5-6 10a6 6 0 0012 0c0-2.5-1-4.5-2-6 0 0-.5 2-2 3C13 7 12 4 12 2z"/>
-            </svg>
+        <!-- 02 Fire Protection -->
+        <div class="service-card">
+          <!-- SWAP PHOTO: replace src with your Fire Protection / defensible space job photo -->
+          <img class="sc-img" src="brand_assets/Merritt.jpg" alt="Fire protection vegetation management">
+          <div class="sc-num">02</div>
+          <div class="sc-content">
+            <span class="sc-icon">🔥</span>
+            <h3 class="sc-title">Fire<br>Protection</h3>
+            <p class="sc-desc">Strategic fuel reduction and defensible space creation to protect your property from wildfire risk across BC's interface zones. We clear dry brush and create safety buffers.</p>
+            <a href="#contact" class="sc-cta">
+              Get a Quote
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
           </div>
-          <div>
-            <h3 class="font-heading text-white mb-3" style="font-size: 1.5rem;">Fire<br />Protection</h3>
-            <p class="text-white/50" style="line-height: 1.7; font-size: 0.9rem; font-weight: 300;">Strategic fuel reduction and defensible space creation to protect your property from wildfire risk across BC's interface zones.</p>
-          </div>
-          <a href="#contact" class="mt-auto text-orange font-heading-md text-sm flex items-center gap-2" style="color: #f28c28; transition: gap 0.2s ease;" onmouseover="this.style.gap='10px'" onmouseout="this.style.gap='8px'">
-            Learn More
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
         </div>
 
-        <!-- Clearing -->
-        <div class="service-card p-8 flex flex-col gap-6">
-          <div class="w-14 h-14 flex items-center justify-center rounded-sm" style="background: rgba(242,140,40,0.1); border: 1px solid rgba(242,140,40,0.25);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8">
-              <path d="M17 8C8 10 5.9 16.17 3.82 19.82M11 7c0 0-1-4 3-6 0 3 2.5 4 2.5 6.5C16.5 9 17 6.5 17 6.5c2 2 2 5.5 0 7.5-1 1-2.5 1.5-4 1.5-3 0-5-2-5-5"/>
-              <line x1="3" y1="22" x2="5" y2="22"/>
-            </svg>
+        <!-- 03 Land Clearing -->
+        <div class="service-card">
+          <!-- SWAP PHOTO: replace src with your Land Clearing job photo -->
+          <img class="sc-img" src="brand_assets/Abbotsford.jpg" alt="Land clearing service">
+          <div class="sc-num">03</div>
+          <div class="sc-content">
+            <span class="sc-icon">🌲</span>
+            <h3 class="sc-title">Land<br>Clearing</h3>
+            <p class="sc-desc">Full-site vegetation removal for development, agriculture, or restoration. We remove trees, stumps, brush, and debris — leaving your land ready for whatever comes next.</p>
+            <a href="#contact" class="sc-cta">
+              Get a Quote
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
           </div>
-          <div>
-            <h3 class="font-heading text-white mb-3" style="font-size: 1.5rem;">Land<br />Clearing</h3>
-            <p class="text-white/50" style="line-height: 1.7; font-size: 0.9rem; font-weight: 300;">Full-site vegetation removal for development, agriculture, or restoration. We leave your land ready for whatever comes next.</p>
-          </div>
-          <a href="#contact" class="mt-auto text-orange font-heading-md text-sm flex items-center gap-2" style="color: #f28c28; transition: gap 0.2s ease;" onmouseover="this.style.gap='10px'" onmouseout="this.style.gap='8px'">
-            Learn More
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
         </div>
 
-        <!-- Storm Clean-Up -->
-        <div class="service-card p-8 flex flex-col gap-6">
-          <div class="w-14 h-14 flex items-center justify-center rounded-sm" style="background: rgba(242,140,40,0.1); border: 1px solid rgba(242,140,40,0.25);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f28c28" stroke-width="1.8">
-              <path d="M19 16.9A5 5 0 0018 7h-1.26A8 8 0 104 15.25"/>
-              <polyline points="13 11 9 17 15 17 11 23"/>
-            </svg>
+        <!-- 04 Storm Clean-Up -->
+        <div class="service-card">
+          <!-- SWAP PHOTO: replace src with your Storm Clean-Up job photo -->
+          <img class="sc-img" src="brand_assets/Hope.jpg" alt="Storm damage clean-up">
+          <div class="sc-num">04</div>
+          <div class="sc-content">
+            <span class="sc-icon">⛈️</span>
+            <h3 class="sc-title">Storm<br>Clean-Up</h3>
+            <p class="sc-desc">Rapid response to storm damage — fallen trees, debris clearance, and site restoration. We respond fast to get your property back to normal safely.</p>
+            <a href="#contact" class="sc-cta">
+              Get a Quote
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
           </div>
-          <div>
-            <h3 class="font-heading text-white mb-3" style="font-size: 1.5rem;">Storm<br />Clean-Up</h3>
-            <p class="text-white/50" style="line-height: 1.7; font-size: 0.9rem; font-weight: 300;">Rapid response to storm damage — fallen trees, debris clearance, and site restoration to get you back to normal fast.</p>
-          </div>
-          <a href="#contact" class="mt-auto text-orange font-heading-md text-sm flex items-center gap-2" style="color: #f28c28; transition: gap 0.2s ease;" onmouseover="this.style.gap='10px'" onmouseout="this.style.gap='8px'">
-            Learn More
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
         </div>
 
       </div>
