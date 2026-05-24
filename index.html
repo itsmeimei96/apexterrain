@@ -196,6 +196,9 @@
     /* Mobile menu */
     #mobile-menu { transition: opacity 0.2s ease, transform 0.2s ease; }
     #mobile-menu.hidden { opacity: 0; pointer-events: none; transform: translateY(-8px); }
+    /* Hero gallery card */
+    .hero-img-card { aspect-ratio: 16/9; }
+    @media(min-width:1024px){ .hero-img-card { aspect-ratio: 4/3; } }
   </style>
 </head>
 <body class="topo-bg">
@@ -287,8 +290,8 @@
       </div>
 
       <!-- Right: hero image card -->
-      <div class="relative hidden lg:block">
-        <div class="relative rounded-sm overflow-hidden orange-glow" style="aspect-ratio: 4/3; border: 1px solid rgba(242,140,40,0.2);">
+      <div class="relative">
+        <div class="hero-img-card relative rounded-sm overflow-hidden orange-glow" style="border: 1px solid rgba(242,140,40,0.2);">
           <!-- Slideshow images -->
           <img id="hero-slide-0" src="brand_assets/Gallery 1.jpg" alt="Apex Terrain project" class="w-full h-full object-cover absolute inset-0" style="opacity: 1; transition: opacity 0.9s ease;" />
           <img id="hero-slide-1" src="brand_assets/Gallery 2.jpg" alt="Apex Terrain project" class="w-full h-full object-cover absolute inset-0" style="opacity: 0; transition: opacity 0.9s ease;" />
@@ -383,7 +386,7 @@
           <div class="sc-content">
             <span class="sc-icon">🌲</span>
             <h3 class="sc-title">Land<br>Clearing</h3>
-            <p class="sc-desc">Full-site vegetation removal for development, agriculture, or restoration. We remove trees, stumps, brush, and debris — leaving your land ready for whatever comes next.</p>
+            <p class="sc-desc">Full-site vegetation removal for development, agriculture, or restoration. We remove trees, brush, and debris — leaving your land ready for whatever comes next.</p>
             <a href="#contact" class="sc-cta">
               Get a Quote
               <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
