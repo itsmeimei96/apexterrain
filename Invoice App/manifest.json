@@ -1,0 +1,22 @@
+{
+  "name": "APEX Operations",
+  "short_name": "APEX Ops",
+  "description": "Apex Terrain Management — Invoice & Field Operations App",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#f28c28",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/itsmeimei96/apexterrain/main/brand_assets/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/itsmeimei96/apexterrain/main/brand_assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

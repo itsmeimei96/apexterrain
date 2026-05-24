@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f28c28">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="APEX Ops">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/itsmeimei96/apexterrain/main/brand_assets/web icon.png">
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/itsmeimei96/apexterrain/main/brand_assets/Logo.jpeg">
+  <title>APEX Operations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <style>
+/* ── Reset & Root ──────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#111; --surface:#1c1c1c; --card:#222; --card2:#2a2a2a;
+  --border:#2e2e2e; --border2:#3a3a3a;
+  --orange:#f28c28; --orange-dim:rgba(242,140,40,.15); --orange-glow:rgba(242,140,40,.4);
+  --text:#f0f0f0; --text2:#aaa; --text3:#666;
+  --green:#22c55e; --green-bg:rgba(34,197,94,.13);
+  --amber:#f59e0b; --amber-bg:rgba(245,158,11,.13);
+  --blue:#60a5fa;  --blue-bg:rgba(96,165,250,.13);
+  --red:#f87171;   --red-bg:rgba(248,113,113,.13);
+  --nav:64px; --hdr:56px; --safe:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased;}
+body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+
+/* ── App Shell ──────────────────────────────────────────────── */
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
+
+/* Header */
+#app-header{height:var(--hdr);background:var(--surface);border-bottom:2px solid var(--orange);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;z-index:10;}
+#app-header img{height:34px;width:auto;}
+#page-title{font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:.08em;flex:1;color:var(--text);}
+#hdr-btn{background:none;border:none;cursor:pointer;color:var(--text2);font-size:22px;padding:6px;line-height:1;transition:color .15s;}
+#hdr-btn:hover{color:var(--orange);}
+
+/* Tab Content */
+#tab-content{flex:1;overflow:hidden;position:relative;}
+.tab-pane{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(var(--nav) + var(--safe) + 16px);display:none;}
+.tab-pane.active{display:block;}
+
+/* Bottom Nav */
+#bottom-nav{height:calc(var(--nav) + var(--safe));padding-bottom:var(--safe);background:var(--surface);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);flex-shrink:0;z-index:10;}
+.nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--text3);font-family:'Roboto',sans-serif;font-size:10px;font-weight:600;letter-spacing:.04em;padding:8px 4px;transition:color .15s;-webkit-tap-highlight-color:transparent;}
+.nav-btn .ni{font-size:22px;line-height:1;}
+.nav-btn.active{color:var(--orange);}
+
+/* FAB */
+#fab{position:fixed;bottom:calc(var(--nav) + var(--safe) + 14px);right:16px;width:54px;height:54px;border-radius:50%;background:var(--orange);color:white;border:none;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px var(--orange-glow);z-index:30;transition:transform .15s;-webkit-tap-highlight-color:transparent;}
+#fab:active{transform:scale(.92);}
+
+/* ── Shared Components ──────────────────────────────────────── */
+.card{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);}
+.sec-title{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;}
+.divider{height:1px;background:var(--border);margin:16px 0;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;padding:11px 18px;font-family:'Roboto',sans-serif;transition:opacity .15s,transform .1s;-webkit-tap-highlight-color:transparent;}
+.btn:active{transform:scale(.96);}
+.btn-orange{background:var(--orange);color:white;box-shadow:0 2px 10px var(--orange-dim);}
+.btn-surface{background:var(--card2);color:var(--text);border:1px solid var(--border2);}
+.btn-full{width:100%;}
+.btn-sm{padding:8px 14px;font-size:12px;}
+.btn-red{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+
+/* Fields */
+.field{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--text);font-family:'Roboto',sans-serif;outline:none;transition:border-color .15s;}
+.field:focus{border-color:var(--orange);}
+.field::placeholder{color:var(--text3);}
+select.field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+.label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:5px;}
+
+/* Status Badges */
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.04em;}
+.s-pending  {background:rgba(245,158,11,.16);color:#f59e0b;}
+.s-deposit  {background:rgba(242,140,40,.18);color:#f28c28;}
+.s-scheduled{background:rgba(96,165,250,.16);color:#60a5fa;}
+.s-balance  {background:rgba(248,113,113,.16);color:#f87171;}
+.s-paid     {background:rgba(34,197,94,.16);color:#22c55e;}
+.s-lost-g   {background:rgba(120,120,120,.15);color:#888;}
+
+.badge-btn{border:none;cursor:pointer;padding:0;background:none;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;gap:3px;}
+.badge-btn:active .badge{opacity:.7;}
+.badge-chevron{font-size:11px;color:var(--text3);}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;color:var(--text3);}
+.empty-ico{font-size:44px;margin-bottom:10px;}
+.empty p{font-size:13px;line-height:1.7;}
+
+/* ── HOME TAB ──────────────────────────────────────────────── */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.sum-card{background:var(--card);border-radius:12px;padding:14px 16px;border-left:3px solid;}
+.sum-card.c-owing{border-left-color:var(--amber);}
+.sum-card.c-won{border-left-color:var(--blue);}
+.sum-card.c-paid{border-left-color:var(--green);}
+.sum-card.c-lost{border-left-color:var(--red);}
+.sum-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px;}
+.sum-val{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;}
+.sum-cnt{font-size:11px;color:var(--text3);margin-top:2px;}
+
+.alert-card{background:rgba(242,140,40,.07);border:1px solid rgba(242,140,40,.2);border-radius:10px;padding:13px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.alert-ico{font-size:22px;flex-shrink:0;}
+.alert-body{flex:1;}
+.alert-title{font-size:13px;font-weight:600;color:var(--orange);}
+.alert-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.alert-btn{background:none;border:1px solid var(--orange);color:var(--orange);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
+/* ── INVOICES TAB ──────────────────────────────────────────── */
+.inv-card{background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s;}
+.inv-card:active{border-color:var(--orange);}
+.ic-row1{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;}
+.ic-num{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;}
+.ic-amt{font-family:'Oswald',sans-serif;font-size:15px;color:var(--orange);}
+.ic-cust{font-size:13px;color:var(--text);margin-bottom:3px;}
+.ic-row2{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+.ic-date{font-size:12px;color:var(--text3);}
+
+/* ── REPORTS TAB ───────────────────────────────────────────── */
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.month-lbl{font-family:'Oswald',sans-serif;font-size:18px;}
+.month-btn{background:var(--card);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 16px;cursor:pointer;font-size:16px;-webkit-tap-highlight-color:transparent;}
+.month-btn:active{border-color:var(--orange);}
+
+.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.metric-box{background:var(--card);border-radius:10px;padding:14px 10px;text-align:center;}
+.metric-val{font-family:'Oswald',sans-serif;font-size:18px;color:var(--orange);}
+.metric-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-top:2px;}
+
+.bar-row{margin-bottom:12px;}
+.bar-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+.bar-city{color:var(--text2);}
+.bar-rev{color:var(--text);font-weight:600;}
+.bar-track{background:var(--card2);border-radius:4px;height:7px;overflow:hidden;}
+.bar-fill{height:100%;background:var(--orange);border-radius:4px;transition:width .5s ease;}
+
+/* ── RECEIPTS TAB ──────────────────────────────────────────── */
+.scan-area{border:2px dashed var(--border2);border-radius:14px;padding:30px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;margin-bottom:14px;background:var(--card);-webkit-tap-highlight-color:transparent;}
+.scan-area:active{border-color:var(--orange);}
+.scan-ico{font-size:44px;}
+.scan-lbl{font-size:15px;font-weight:600;}
+.scan-sub{font-size:12px;color:var(--text3);}
+
+.progress-wrap{background:var(--card);border-radius:12px;padding:18px;text-align:center;margin-bottom:14px;}
+.progress-txt{font-size:13px;font-weight:600;margin-bottom:4px;}
+.progress-sub{font-size:11px;color:var(--text3);margin-bottom:10px;}
+.progress-track{background:var(--border2);border-radius:4px;height:5px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--orange);border-radius:4px;transition:width .3s;}
+
+.r-form{background:var(--card);border-radius:12px;padding:16px;margin-bottom:14px;}
+.r-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.form-grp{margin-bottom:10px;}
+
+.exp-card{background:var(--card);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.exp-dot{width:4px;height:36px;border-radius:2px;flex-shrink:0;}
+.exp-dot.Transportation{background:var(--blue);}
+.exp-dot.Supplies{background:var(--orange);}
+.exp-dot\.Food{background:var(--amber);}
+.exp-dot.Equipment{background:var(--green);}
+.exp-dot.Other{background:var(--text3);}
+.exp-body{flex:1;}
+.exp-vendor{font-size:13px;font-weight:600;}
+.exp-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+.exp-amt{font-family:'Oswald',sans-serif;font-size:16px;color:var(--orange);flex-shrink:0;}
+
+/* ── EDITOR (Full-Screen Slide-Up) ─────────────────────────── */
+#editor{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
+#editor.open{transform:translateY(0);}
+#ed-hdr{height:var(--hdr);background:var(--surface);border-bottom:2px solid var(--orange);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;}
+.ed-back{background:none;border:1px solid var(--border2);color:var(--text2);border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;}
+#ed-title{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.06em;flex:1;}
+.ed-preview-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:6px 10px;border:1px solid var(--border2);border-radius:6px;}
+
+#ed-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.ed-sec{padding:16px;border-bottom:1px solid var(--border);}
+.ed-sec-title{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-bottom:12px;}
+
+.form-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-grp{margin-bottom:10px;}
+.ed-field{width:100%;background:#1a1a1a;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);font-family:'Roboto',sans-serif;outline:none;transition:border-color .15s;}
+.ed-field:focus{border-color:var(--orange);}
+.ed-field::placeholder{color:#444;}
+select.ed-field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;}
+
+/* Line item card */
+.li-card{background:#1a1a1a;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid var(--border);position:relative;}
+.li-desc{margin-bottom:10px;padding-right:28px;}
+.li-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.li-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:4px;}
+.li-val{font-family:'Oswald',sans-serif;font-size:15px;color:var(--orange);}
+.li-rm{position:absolute;top:10px;right:10px;background:none;border:none;color:#444;font-size:20px;cursor:pointer;padding:4px;line-height:1;transition:color .15s;}
+.li-rm:active{color:var(--red);}
+.li-sel{width:100%;background:#111;border:1px solid var(--border2);border-radius:8px;padding:9px 32px 9px 12px;font-size:13px;color:var(--text);font-family:'Roboto',sans-serif;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+.li-sel:focus{border-color:var(--orange);outline:none;}
+.li-inp{width:100%;background:#111;border:1px solid var(--border2);border-radius:6px;padding:8px 10px;font-size:14px;color:var(--text);font-family:'Roboto',sans-serif;outline:none;}
+.li-inp:focus{border-color:var(--orange);}
+
+/* Totals mini */
+.totals-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;color:var(--text2);}
+.totals-row.total{font-size:16px;font-weight:700;color:var(--text);border-top:1px solid var(--border2);padding-top:10px;margin-top:4px;}
+.totals-row.total span:last-child{color:var(--orange);}
+
+#ed-actions{padding:12px 14px calc(14px + var(--safe));background:var(--surface);border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+
+/* ── Preview Modal ──────────────────────────────────────────── */
+#preview-modal{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:110;overflow:auto;display:none;}
+#preview-modal.open{display:block;}
+#preview-close{position:fixed;top:14px;right:14px;z-index:120;background:var(--card2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:'Roboto',sans-serif;}
+#invoice-preview{width:816px;min-height:1056px;background:white;margin:60px auto 24px;font-family:'Roboto',Arial,sans-serif;font-size:13px;color:#1a1a1a;}
+.inv-th{font-family:'Oswald',sans-serif;font-weight:500;letter-spacing:.06em;font-size:12px;padding:8px 12px;color:white;}
+
+/* ── Settings Sheet ─────────────────────────────────────────── */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .22s;}
+.sheet-bg.open{opacity:1;pointer-events:all;}
+.sheet{background:var(--surface);border-radius:18px 18px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:18px 16px calc(18px + var(--safe));transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.sheet-bg.open .sheet{transform:translateY(0);}
+.sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px;}
+.sheet-title{font-family:'Oswald',sans-serif;font-size:16px;letter-spacing:.06em;margin-bottom:16px;}
+.sheet-sec{margin-bottom:18px;}
+.sheet-sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange);margin-bottom:10px;}
+
+/* ── Form Search Sheet ──────────────────────────────────────── */
+.fsearch-item{padding:12px 14px;border-radius:8px;background:var(--card);margin-bottom:8px;cursor:pointer;border:1px solid var(--border);-webkit-tap-highlight-color:transparent;transition:border-color .15s;}
+.fsearch-item:active{border-color:var(--orange);}
+.fsearch-name{font-size:13px;font-weight:600;}
+.fsearch-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.sync-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px;background:var(--text3);}
+.sync-dot.synced{background:var(--green);}
+.sync-dot.pending{background:var(--amber);}
+
+/* ── Toast ──────────────────────────────────────────────────── */
+#toast{position:fixed;bottom:calc(var(--nav) + var(--safe) + 12px);left:50%;transform:translateX(-50%) translateY(16px);background:#2a2a2a;color:var(--text);padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:500;white-space:nowrap;border:1px solid var(--border2);}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── Confirm Dialog ─────────────────────────────────────────── */
+#confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;}
+#confirm-bg.open{display:flex;}
+#confirm-box{background:var(--surface);border-radius:14px;padding:22px;width:100%;max-width:310px;border:1px solid var(--border2);}
+#confirm-msg{font-size:14px;line-height:1.65;margin-bottom:18px;}
+#confirm-btns{display:flex;gap:10px;}
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════════════════════ -->
+<div id="app">
+  <header id="app-header">
+    <img src="https://raw.githubusercontent.com/itsmeimei96/apexterrain/main/brand_assets/Logo.jpeg" alt="APEX">
+    <span id="page-title">HOME</span>
+    <button id="hdr-btn" onclick="openSettings()">⚙</button>
+  </header>
+
+  <main id="tab-content">
+
+    <!-- ── HOME ───────────────────────────────────────────── -->
+    <div id="pane-home" class="tab-pane active">
+      <div class="sum-grid">
+        <div class="sum-card c-owing">
+          <div class="sum-lbl">🟡 Pending</div>
+          <div class="sum-val" id="s-quotes">$0</div>
+          <div class="sum-cnt" id="c-quotes">0 quotes</div>
+        </div>
+        <div class="sum-card c-won">
+          <div class="sum-lbl">🔵 Scheduled</div>
+          <div class="sum-val" id="s-active">$0</div>
+          <div class="sum-cnt" id="c-active">0 jobs</div>
+        </div>
+        <div class="sum-card c-lost">
+          <div class="sum-lbl">🔴 Balance Owing</div>
+          <div class="sum-val" id="s-balance">$0</div>
+          <div class="sum-cnt" id="c-balance">0 invoices</div>
+        </div>
+        <div class="sum-card c-paid">
+          <div class="sum-lbl">🟢 Paid</div>
+          <div class="sum-val" id="s-paid">$0</div>
+          <div class="sum-cnt" id="c-paid">0 invoices</div>
+        </div>
+      </div>
+
+      <div class="sec-title">⚠ Needs Attention</div>
+      <div id="alerts-list"></div>
+    </div>
+
+    <!-- ── INVOICES ────────────────────────────────────────── -->
+    <div id="pane-invoices" class="tab-pane">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <input id="inv-search" class="field" type="text" placeholder="Search invoices…" oninput="filterInvoices(this.value)" style="flex:1;margin-bottom:0;">
+        <button onclick="fetchSheetInvoices().then(()=>toast('Synced!'))" style="background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;cursor:pointer;font-size:16px;flex-shrink:0;-webkit-tap-highlight-color:transparent;" title="Pull latest from Google Sheets">↻</button>
+      </div>
+      <div id="invoice-list"></div>
+    </div>
+
+    <!-- ── REPORTS ─────────────────────────────────────────── -->
+    <div id="pane-reports" class="tab-pane">
+      <div class="month-nav">
+        <button class="month-btn" onclick="shiftMonth(-1)">‹</button>
+        <span class="month-lbl" id="month-lbl"></span>
+        <button class="month-btn" onclick="shiftMonth(1)">›</button>
+      </div>
+      <div class="metric-row">
+        <div class="metric-box"><div class="metric-val" id="rep-rev">$0</div><div class="metric-lbl">Revenue</div></div>
+        <div class="metric-box"><div class="metric-val" id="rep-jobs">0</div><div class="metric-lbl">Jobs</div></div>
+        <div class="metric-box"><div class="metric-val" id="rep-avg">$0</div><div class="metric-lbl">Avg Job</div></div>
+      </div>
+      <div class="sec-title">📍 Top Service Areas</div>
+      <div id="city-chart"></div>
+    </div>
+
+    <!-- ── RECEIPTS ────────────────────────────────────────── -->
+    <div id="pane-receipts" class="tab-pane">
+      <label class="scan-area" for="receipt-file">
+        <div class="scan-ico">📷</div>
+        <div class="scan-lbl">Scan Receipt</div>
+        <div class="scan-sub">Photo or image upload</div>
+        <input type="file" id="receipt-file" accept="image/*" capture="environment" style="display:none;" onchange="handleScan(this)">
+      </label>
+
+      <div id="scan-wrap" style="display:none;">
+        <div class="progress-wrap">
+          <div class="progress-txt">Scanning receipt…</div>
+          <div class="progress-sub" id="scan-sub">Initializing</div>
+          <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div id="r-form" class="r-form" style="display:none;">
+        <div style="font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;margin-bottom:12px;">Receipt Details</div>
+        <div class="form-grp"><label class="label">Vendor / Store</label><input id="r-vendor" class="field" type="text" placeholder="e.g. Shell Gas Station"></div>
+        <div class="r-form-grid">
+          <div><label class="label">Date</label><input id="r-date" class="field" type="date"></div>
+          <div><label class="label">Total ($)</label><input id="r-total" class="field" type="number" placeholder="0.00" min="0" step="0.01"></div>
+        </div>
+        <div class="form-grp">
+          <label class="label">Category</label>
+          <select id="r-cat" class="field">
+            <option value="Transportation">🚗 Transportation</option>
+            <option value="Supplies">🔧 Supplies</option>
+            <option value="Food & Travel">🍔 Food &amp; Travel</option>
+            <option value="Equipment">⚙ Equipment</option>
+            <option value="Other">📦 Other</option>
+          </select>
+        </div>
+        <div class="form-grp"><label class="label">Notes (optional)</label><input id="r-notes" class="field" type="text" placeholder="Job # or description"></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-surface btn-sm" onclick="cancelScan()">Cancel</button>
+          <button class="btn btn-orange btn-sm" style="flex:1;" onclick="saveReceipt()">Save Expense</button>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div class="sec-title" style="margin-bottom:0;">Expense Log</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-surface btn-sm" onclick="openManualReceipt()">+ Manual</button>
+          <button class="btn btn-surface btn-sm" onclick="exportCSV()">⬇ CSV</button>
+        </div>
+      </div>
+      <div id="expense-list"></div>
+    </div>
+
+  </main>
+
+  <nav id="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('home')"><span class="ni">🏠</span><span>Home</span></button>
+    <button class="nav-btn" onclick="switchTab('invoices')"><span class="ni">📋</span><span>Invoices</span></button>
+    <button class="nav-btn" onclick="switchTab('reports')"><span class="ni">📊</span><span>Reports</span></button>
+    <button class="nav-btn" onclick="switchTab('receipts')"><span class="ni">🧾</span><span>Receipts</span></button>
+  </nav>
+</div>
+
+<button id="fab" onclick="openEditor(null)">+</button>
+
+<!-- ══════════════════════════════════════════════════════════
+     EDITOR (FULL SCREEN)
+══════════════════════════════════════════════════════════ -->
+<div id="editor">
+  <header id="ed-hdr">
+    <button class="ed-back" onclick="closeEditor()">← Back</button>
+    <span id="ed-title">NEW INVOICE</span>
+    <button class="ed-preview-btn" onclick="openPreview()">👁 Preview</button>
+  </header>
+
+  <div id="ed-body">
+    <!-- Customer -->
+    <div class="ed-sec">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="ed-sec-title" style="margin-bottom:0;">Invoice To</div>
+        <button class="btn btn-surface btn-sm" onclick="openFormSearch()" style="font-size:11px;padding:6px 10px;">🔍 Search Requests</button>
+      </div>
+      <div class="form-grp"><label class="label">Customer / Company Name</label><input id="f-name" class="ed-field" type="text" placeholder="Customer Name"></div>
+      <div class="form-row2">
+        <div class="form-grp"><label class="label">Street Address</label><input id="f-street" class="ed-field" type="text" placeholder="Street address"></div>
+        <div class="form-grp"><label class="label">City, Province, Postal</label><input id="f-city" class="ed-field" type="text" placeholder="City, BC"></div>
+      </div>
+      <div class="form-grp"><label class="label">Customer Email</label><input id="f-email" class="ed-field" type="email" placeholder="customer@email.com"></div>
+    </div>
+
+    <!-- Invoice Details -->
+    <div class="ed-sec">
+      <div class="ed-sec-title">Invoice Details</div>
+      <div class="form-row2">
+        <div class="form-grp"><label class="label">Invoice #</label><input id="f-num" class="ed-field" type="text" placeholder="INV-001"></div>
+        <div class="form-grp">
+          <label class="label">Service City</label>
+          <select id="f-scity" class="ed-field">
+            <option value="">Select city…</option>
+            <option>Abbotsford</option><option>Chilliwack</option><option>Hope</option>
+            <option>Langley</option><option>Lower Mainland</option><option>Maple Ridge</option>
+            <option>Merritt</option><option>Mission</option><option>North Vancouver</option>
+            <option>Port Coquitlam</option><option>Richmond</option><option>Surrey</option>
+            <option>Vancouver</option><option>West Vancouver</option><option>Whistler</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row2">
+        <div class="form-grp"><label class="label">Date</label><input id="f-date" class="ed-field" type="date"></div>
+        <div class="form-grp"><label class="label">Due Date</label><input id="f-due" class="ed-field" type="date"></div>
+      </div>
+      <div class="form-row2">
+        <div class="form-grp"><label class="label">Terms</label><input id="f-terms" class="ed-field" type="text" placeholder="Net 30"></div>
+        <div class="form-grp">
+          <label class="label">Invoice Status</label>
+          <select id="f-status-label" class="ed-field" onchange="updateEditorBadge()">
+            <option value="Pending">🟡  Pending — Quote Sent</option>
+            <option value="Deposit Owing">🟠  Deposit Owing</option>
+            <option value="Scheduled">🔵  Scheduled — Deposit Received</option>
+            <option value="Balance Owing">🔴  Balance Owing — Job Done</option>
+            <option value="Paid">🟢  Paid — Fully Settled</option>
+            <option value="Lost">⚫  Lost</option>
+          </select>
+        </div>
+      </div>
+      <div style="padding:2px 0 8px;" id="ed-badge-preview"></div>
+      <div class="form-row2">
+        <div class="form-grp"><label class="label">Discount ($)</label><input id="f-disc" class="ed-field" type="number" value="0" min="0" step="0.01"></div>
+        <div class="form-grp"><label class="label">GST Rate (%)</label><input id="f-gst" class="ed-field" type="number" value="5" min="0" max="100" step="0.1"></div>
+      </div>
+    </div>
+
+    <!-- Line Items -->
+    <div class="ed-sec">
+      <div class="ed-sec-title">Line Items</div>
+      <div id="li-list"></div>
+      <button class="btn btn-surface btn-sm btn-full" onclick="addLine()" style="margin-top:6px;">+ Add Line Item</button>
+    </div>
+
+    <!-- Notes -->
+    <div class="ed-sec">
+      <div class="ed-sec-title">Notes</div>
+      <textarea id="f-notes" class="ed-field" rows="3" placeholder="Payment instructions, thank you note…" style="resize:vertical;line-height:1.6;"></textarea>
+    </div>
+
+    <!-- Totals -->
+    <div class="ed-sec">
+      <div class="totals-row"><span>Subtotal</span><span id="t-sub">$0.00</span></div>
+      <div class="totals-row"><span>Discount</span><span id="t-disc">$ -</span></div>
+      <div class="totals-row"><span>GST</span><span id="t-gst">$0.00</span></div>
+      <div class="totals-row total"><span>Balance Due</span><span id="t-bal">$0.00</span></div>
+    </div>
+    <div style="height:8px;"></div>
+  </div>
+
+  <div id="ed-actions">
+    <button class="btn btn-surface btn-sm" onclick="downloadPDF()">↓ PDF</button>
+    <button class="btn btn-surface btn-sm" onclick="openEmailModal()">✉ Email</button>
+    <button class="btn btn-orange btn-sm" style="flex:1;" onclick="saveInvoice()">✓ Save</button>
+  </div>
+</div>
+
+<!-- Invoice Preview Modal -->
+<div id="preview-modal">
+  <button id="preview-close" onclick="closePreview()">✕ Close</button>
+  <div id="invoice-preview"></div>
+</div>
+
+<!-- Settings Sheet -->
+<div id="settings-bg" class="sheet-bg" onclick="closeSettings(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">⚙ Settings</div>
+    <div class="sheet-sec">
+      <div class="sheet-sec-title">Company Info</div>
+      <div class="form-grp"><label class="label">Company Name</label><input id="s-name" class="field" type="text" value="Apex Terrain Management Ltd."></div>
+      <div class="form-grp"><label class="label">Street Address</label><input id="s-street" class="field" type="text" placeholder="Your street address"></div>
+      <div class="form-grp"><label class="label">City, Province, Postal</label><input id="s-city" class="field" type="text" placeholder="City, Province, Postal"></div>
+      <div class="form-grp"><label class="label">Phone</label><input id="s-phone" class="field" type="text" placeholder="(123) 456-7890"></div>
+      <div class="form-grp"><label class="label">Email</label><input id="s-email" class="field" type="email" placeholder="youremail@domain.com"></div>
+      <div class="form-grp"><label class="label">GST Reg #</label><input id="s-gst-reg" class="field" type="text" placeholder="GST registration number"></div>
+      <div class="form-grp"><label class="label">E-transfer Payment Email</label><input id="s-pay-email" class="field" type="email" placeholder="payment@yourcompany.com"></div>
+    </div>
+    <div class="sheet-sec">
+      <div class="sheet-sec-title">Google Sheets Sync</div>
+      <div class="form-grp"><label class="label">Apps Script URL</label><input id="s-sheets-url" class="field" type="url" placeholder="https://script.google.com/macros/s/…/exec"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:-4px;line-height:1.6;">Deploy your Code.gs as a Web App (Execute as: Me, Access: Anyone) and paste the /exec URL above.</div>
+    </div>
+    <div class="sheet-sec">
+      <div class="sheet-sec-title">EmailJS</div>
+      <div class="form-grp"><label class="label">Service ID</label><input id="s-ej-svc" class="field" type="text"></div>
+      <div class="form-grp"><label class="label">Template ID</label><input id="s-ej-tpl" class="field" type="text"></div>
+      <div class="form-grp"><label class="label">Public Key</label><input id="s-ej-key" class="field" type="text"></div>
+    </div>
+    <button class="btn btn-orange btn-full" onclick="saveSettings()">Save Settings</button>
+    <button class="btn btn-surface btn-full" style="margin-top:10px;" onclick="closeSettings()">Cancel</button>
+  </div>
+</div>
+
+<!-- Email Sheet -->
+<div id="email-bg" class="sheet-bg" onclick="closeEmailModal(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">✉ Send Invoice</div>
+    <div class="form-grp"><label class="label">Recipient Email</label><input id="m-email" class="field" type="email" placeholder="customer@email.com"></div>
+    <div class="form-grp"><label class="label">Subject</label><input id="m-subject" class="field" type="text"></div>
+    <div class="form-grp"><label class="label">Message</label><textarea id="m-msg" class="field" rows="3" style="resize:none;line-height:1.6;" placeholder="Please find your invoice below…"></textarea></div>
+    <div id="m-status" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;"></div>
+    <button class="btn btn-orange btn-full" id="btn-send-email" onclick="sendEmail()">Send Invoice</button>
+    <button class="btn btn-surface btn-full" style="margin-top:10px;" onclick="closeEmailModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- Quick Action Sheet -->
+<div id="qa-bg" class="sheet-bg" onclick="closeQA(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+      <div style="flex:1;">
+        <div style="font-family:'Oswald',sans-serif;font-size:16px;letter-spacing:.04em;" id="qa-inv-num"></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;" id="qa-inv-cust"></div>
+      </div>
+      <div id="qa-cur-badge"></div>
+    </div>
+    <div id="qa-actions" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <button class="btn btn-surface btn-full" style="margin-top:12px;" onclick="closeQA()">Cancel</button>
+  </div>
+</div>
+
+<!-- Form Submissions Search Sheet -->
+<div id="fsearch-bg" class="sheet-bg" onclick="closeFSearch(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">🔍 Search Existing Requests</div>
+    <input id="fsearch-q" class="field" type="text" placeholder="Type customer name…" oninput="filterFormSearch(this.value)" style="margin-bottom:12px;">
+    <div id="fsearch-list"><p style="text-align:center;color:var(--text3);font-size:13px;padding:16px 0;">Loading…</p></div>
+    <button class="btn btn-surface btn-full" style="margin-top:12px;" onclick="closeFSearch()">Cancel</button>
+  </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div id="confirm-bg">
+  <div id="confirm-box">
+    <div id="confirm-msg"></div>
+    <div id="confirm-btns">
+      <button class="btn btn-surface btn-sm" style="flex:1;" onclick="confirmNo()">Cancel</button>
+      <button class="btn btn-red btn-sm" style="flex:1;" onclick="confirmYes()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  FIREBASE
+// ═══════════════════════════════════════════════════════════════
+const FB_CFG = {
+  apiKey:"AIzaSyCew7H3p0WR_JxbMEaCUyTh3e3LFyP27Hk",
+  authDomain:"apex-invoice-8c872.firebaseapp.com",
+  projectId:"apex-invoice-8c872",
+  storageBucket:"apex-invoice-8c872.firebasestorage.app",
+  messagingSenderId:"340911188880",
+  appId:"1:340911188880:web:f57772010c891846982115"
+};
+firebase.initializeApp(FB_CFG);
+const db     = firebase.firestore();
+const invCol = db.collection('invoices');
+const expCol = db.collection('expenses');
+db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+
+// ═══════════════════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+const SERVICES = [
+  {label:'Minimum Service Fee (3 hours)', unit:'Hours', rate:250},
+  {label:'Service Fee',                   unit:'Hours', rate:250},
+  {label:'Minimum Travel Fee',            unit:'Trips', rate:100},
+  {label:'Travel Fee',                    unit:'Trips', rate:100},
+  {label:'Labor / Operator hours',        unit:'Hours', rate:85},
+  {label:'Travel Time (≤1 hr)',           unit:'Hours', rate:100},
+  {label:'Mulch',                         unit:'Bags',  rate:0},
+  {label:'Disposal Fee',                  unit:'Load',  rate:0},
+  {label:'Paver Installation',            unit:'Sq Ft', rate:0},
+  {label:'Discount',                      unit:'',      rate:0, isDiscount:true},
+];
+const EJ = {svc:'service_dod1yfs', tpl:'template_o2by2hk', key:'AtIAxkG9wGaNxj5H9'};
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwloR_tx0TJhHyjYsyTYQNY0CFKjrUyV4YZdbTcKQMFl6Aw5Mm6EIAxUAwciCywdiuT6g/exec';
+const TEN_DAYS = 10*24*60*60*1000;
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+let invoices=[], expenses=[], lineItems=[], editingId=null, formSubmissions=[];
+let reportMonth=new Date(), currentTab='home';
+let pendingDelId=null, pendingDelType=null;
+
+// ═══════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════
+const $=id=>document.getElementById(id);
+const val=id=>{const e=$(id);return e?e.value.trim():'';}
+const setText=(id,t)=>{const e=$(id);if(e)e.textContent=t;};
+const fmt=n=>'$'+Math.abs(n).toFixed(2);
+const fmtM=n=>'$'+Number(n).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtD=s=>{if(!s)return'';const d=new Date(s+'T00:00:00');return d.toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});};
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function computeBadge(inv){
+  // Legacy support for old single-status invoices
+  const proj=inv.projectStatus||(inv.status==='Lost'?'Lost':inv.status==='Paid'||inv.status==='Won'?'Won':'Quote');
+  const pay=inv.paymentStatus||(inv.status==='Paid'?'Fully Paid':inv.status==='Won'?'Deposit Owing':'None');
+  const done=inv.jobCompleted||false;
+  if(proj==='Lost') return{label:'Lost',       cls:'s-lost-g'};
+  if(proj==='Quote') return{label:'Pending',   cls:'s-pending'};
+  if(pay==='Fully Paid') return{label:'Paid',  cls:'s-paid'};
+  if(done||pay==='Balance Owing') return{label:'Balance Owing',cls:'s-balance'};
+  if(pay==='Deposit Paid') return{label:'Scheduled',cls:'s-scheduled'};
+  return{label:'Deposit Owing',cls:'s-deposit'};
+}
+
+function toast(msg,ok=true){
+  const t=$('toast');t.textContent=msg;
+  t.style.background=ok?'#2a2a2a':'rgba(248,113,113,.15)';
+  t.style.color=ok?'#f0f0f0':'#f87171';
+  t.style.borderColor=ok?'#3a3a3a':'rgba(248,113,113,.3)';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);
+}
+const esc2=s=>String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+// ═══════════════════════════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════════════════════════
+function getS(){
+  const s=JSON.parse(localStorage.getItem('apex-settings')||'{}');
+  return Object.assign({svc:EJ.svc,tpl:EJ.tpl,key:EJ.key},s);
+}
+function loadSettings(){
+  const s=getS();
+  if(s.name)   $('s-name').value=s.name;
+  if(s.street) $('s-street').value=s.street;
+  if(s.city)   $('s-city').value=s.city;
+  if(s.phone)  $('s-phone').value=s.phone;
+  if(s.email)  $('s-email').value=s.email;
+  if(s.gstReg)     $('s-gst-reg').value=s.gstReg;
+  if(s.payEmail)   $('s-pay-email').value=s.payEmail;
+  $('s-sheets-url').value=s.sheetsUrl||GAS_URL;
+  $('s-ej-svc').value=s.svc;
+  $('s-ej-tpl').value=s.tpl;
+  $('s-ej-key').value=s.key;
+}
+function saveSettings(){
+  localStorage.setItem('apex-settings',JSON.stringify({
+    name:val('s-name'),street:val('s-street'),city:val('s-city'),
+    phone:val('s-phone'),email:val('s-email'),gstReg:val('s-gst-reg'),payEmail:val('s-pay-email'),
+    sheetsUrl:val('s-sheets-url'),
+    svc:val('s-ej-svc'),tpl:val('s-ej-tpl'),key:val('s-ej-key')
+  }));
+  closeSettings();toast('Settings saved!');
+}
+function openSettings(){$('settings-bg').classList.add('open');}
+function closeSettings(e){if(!e||e.target===$('settings-bg'))$('settings-bg').classList.remove('open');}
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+const TAB_TITLES={home:'HOME',invoices:'INVOICES',reports:'REPORTS',receipts:'RECEIPTS'};
+
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  $(`pane-${tab}`).classList.add('active');
+  document.querySelectorAll('.nav-btn')[['home','invoices','reports','receipts'].indexOf(tab)].classList.add('active');
+  setText('page-title',TAB_TITLES[tab]);
+  $('fab').style.display=(tab==='invoices')?'flex':'none';
+  if(tab==='home')     renderHome();
+  if(tab==='invoices') fetchSheetInvoices();
+  if(tab==='reports')  renderReports();
+  if(tab==='receipts') renderExpenses();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HOME TAB
+// ═══════════════════════════════════════════════════════════════
+function renderHome(){
+  const sum=arr=>arr.reduce((s,i)=>s+(i.total||0),0);
+  const getBadge=i=>computeBadge(i).label;
+  const quotes  =invoices.filter(i=>getBadge(i)==='Pending');
+  const active  =invoices.filter(i=>['Deposit Owing','Scheduled'].includes(getBadge(i)));
+  const balance =invoices.filter(i=>getBadge(i)==='Balance Owing');
+  const paid    =invoices.filter(i=>getBadge(i)==='Paid');
+
+  setText('s-quotes', fmtM(sum(quotes)));  setText('c-quotes', `${quotes.length} quote${quotes.length!==1?'s':''}`);
+  setText('s-active', fmtM(sum(active)));  setText('c-active', `${active.length} job${active.length!==1?'s':''}`);
+  setText('s-balance',fmtM(sum(balance))); setText('c-balance',`${balance.length} invoice${balance.length!==1?'s':''}`);
+  setText('s-paid',   fmtM(sum(paid)));    setText('c-paid',   `${paid.length} invoice${paid.length!==1?'s':''}`);
+
+  const now=Date.now();
+  const flagged=invoices.filter(i=>{
+    const b=getBadge(i);
+    if(!['Pending','Deposit Owing','Balance Owing'].includes(b)) return false;
+    return (now-(i.updatedAt||i.createdAt||0))>TEN_DAYS;
+  });
+
+  const el=$('alerts-list');
+  if(!flagged.length){
+    el.innerHTML=`<div class="empty" style="padding:20px 0;">
+      <div style="font-size:36px;margin-bottom:8px;">✅</div>
+      <p>All caught up! No follow-ups needed.</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML=flagged.map(inv=>{
+    const b=computeBadge(inv);
+    const days=Math.floor((now-(inv.updatedAt||inv.createdAt||now))/86400000);
+    return `<div class="alert-card">
+      <div class="alert-ico">⚠️</div>
+      <div class="alert-body">
+        <div class="alert-title">Follow-up: ${esc(inv.customer?.name||'Unknown')}</div>
+        <div class="alert-sub">${esc(inv.number||'')} · ${b.label} · ${days} days</div>
+      </div>
+      <button class="alert-btn" onclick="openQA('${inv.id}')">Action →</button>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INVOICES TAB
+// ═══════════════════════════════════════════════════════════════
+function renderInvoiceList(data){
+  const el=$('invoice-list');
+  if(!data||!data.length){
+    el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><p>No invoices yet.<br>Tap <strong>+</strong> to create your first one.</p></div>`;
+    return;
+  }
+  el.innerHTML=data.map(inv=>{
+    const b=computeBadge(inv);
+    return `<div class="inv-card" onclick="openEditor(invoices.find(i=>i.id==='${inv.id}'))">
+      <div class="ic-row1">
+        <span class="ic-num">${esc(inv.number||'—')}</span>
+        <span class="ic-amt">${fmtM(inv.total||0)}</span>
+      </div>
+      <div class="ic-cust">${esc(inv.customer?.name||'—')}</div>
+      <div class="ic-row2">
+        <span class="ic-date">${fmtD(inv.date)||'—'}${inv.serviceCity?` · ${esc(inv.serviceCity)}`:''}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="badge-btn" onclick="event.stopPropagation();openQA('${inv.id}')">
+            <span class="badge ${b.cls}">${b.label}</span>
+            <span class="badge-chevron">›</span>
+          </button>
+          <button style="background:none;border:none;color:#555;cursor:pointer;font-size:16px;padding:4px;" onclick="event.stopPropagation();deleteItem('${inv.id}','invoice')" title="Delete">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterInvoices(q){
+  q=q.toLowerCase();
+  const data=q?invoices.filter(i=>(i.number||'').toLowerCase().includes(q)||(i.customer?.name||'').toLowerCase().includes(q)):invoices;
+  renderInvoiceList(data);
+}
+
+// ── QUICK ACTIONS ─────────────────────────────────────────────
+let qaInvId=null;
+
+function openQA(id){
+  qaInvId=id;
+  const inv=invoices.find(i=>i.id===id);
+  if(!inv)return;
+  const b=computeBadge(inv);
+  $('qa-inv-num').textContent=inv.number||'Invoice';
+  $('qa-inv-cust').textContent=inv.customer?.name||'';
+  $('qa-cur-badge').innerHTML=`<span class="badge ${b.cls}">${b.label}</span>`;
+  const actions=getQuickActions(inv);
+  $('qa-actions').innerHTML=actions.length
+    ?actions.map(a=>`<button class="btn btn-full ${a.style||'btn-surface'}" style="justify-content:flex-start;font-size:14px;padding:13px 16px;" onclick="qaAction('${a.id}')">${a.label}</button>`).join('')
+    :`<p style="text-align:center;color:var(--text3);font-size:13px;padding:10px 0;">No further actions — invoice is closed.</p>`;
+  $('qa-bg').classList.add('open');
+}
+function closeQA(e){if(!e||e.target===$('qa-bg'))$('qa-bg').classList.remove('open');}
+
+function getQuickActions(inv){
+  const b=computeBadge(inv);
+  switch(b.label){
+    case 'Pending': return [
+      {id:'won',      label:'✅  Customer Said Yes — Won',     style:'btn-orange'},
+      {id:'lost',     label:'✗  Mark as Lost'}
+    ];
+    case 'Deposit Owing': return [
+      {id:'dep-paid', label:'💳  Deposit Received',            style:'btn-orange'},
+      {id:'lost',     label:'✗  Mark as Lost'}
+    ];
+    case 'Scheduled': return [
+      {id:'job-done', label:'🏁  Job Completed — Request Balance', style:'btn-orange'},
+      {id:'lost',     label:'✗  Cancel / Mark Lost'}
+    ];
+    case 'Balance Owing': return [
+      {id:'bal-paid', label:'💰  Balance Received — Fully Paid', style:'btn-orange'}
+    ];
+    case 'Paid': return [];
+    case 'Lost': return [
+      {id:'reopen',   label:'↩  Reopen as Quote'}
+    ];
+  }
+  return[];
+}
+
+async function qaAction(actionId){
+  if(!qaInvId)return;
+  const updates={updatedAt:Date.now()};
+  switch(actionId){
+    case 'won':      updates.projectStatus='Won';  updates.paymentStatus='Deposit Owing'; updates.jobCompleted=false; break;
+    case 'dep-paid': updates.paymentStatus='Deposit Paid'; break;
+    case 'job-done': updates.jobCompleted=true;    updates.paymentStatus='Balance Owing'; break;
+    case 'bal-paid': updates.paymentStatus='Fully Paid'; break;
+    case 'lost':     updates.projectStatus='Lost'; break;
+    case 'reopen':   updates.projectStatus='Quote'; updates.paymentStatus='None'; updates.jobCompleted=false; break;
+  }
+  $('qa-bg').classList.remove('open');
+  const idForSync=qaInvId;
+  try{
+    await invCol.doc(idForSync).update(updates);
+    const inv=invoices.find(i=>i.id===idForSync);
+    if(inv) syncToSheet(Object.assign({},inv,updates));
+    toast('Updated!');
+  }catch(e){toast('Update failed',false);}
+  qaInvId=null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EDITOR
+// ═══════════════════════════════════════════════════════════════
+function openEditor(inv){
+  editingId=inv?inv.id:null;
+  setText('ed-title',inv?'EDIT INVOICE':'NEW INVOICE');
+  if(inv){loadInv(inv);}else{resetForm();}
+  renderLines();calcTotals();
+  $('editor').classList.add('open');
+  $('fab').style.display='none';
+}
+function closeEditor(){
+  $('editor').classList.remove('open');
+  if(currentTab==='invoices') $('fab').style.display='flex';
+}
+
+function resetForm(){
+  const today=new Date().toISOString().split('T')[0];
+  const due=new Date();due.setDate(due.getDate()+30);
+  $('f-name').value='';$('f-street').value='';$('f-city').value='';$('f-email').value='';
+  $('f-num').value=nextNum();$('f-scity').value='';
+  $('f-date').value=today;$('f-due').value=due.toISOString().split('T')[0];
+  $('f-terms').value='Net 30';
+  $('f-status-label').value='Pending';
+  $('f-disc').value='0';$('f-gst').value='5';$('f-notes').value='';
+  updateEditorBadge();
+  lineItems=[
+    {service:'Minimum Service Fee (3 hours)',customDesc:'',qty:3,unit:'Hours',rate:250},
+    {service:'Minimum Travel Fee',customDesc:'',qty:1,unit:'Trips',rate:100}
+  ];
+}
+function loadInv(inv){
+  $('f-name').value=inv.customer?.name||'';
+  $('f-street').value=inv.customer?.street||'';
+  $('f-city').value=inv.customer?.city||'';
+  $('f-email').value=inv.customer?.email||'';
+  $('f-num').value=inv.number||'';
+  $('f-scity').value=inv.serviceCity||'';
+  $('f-date').value=inv.date||'';
+  $('f-due').value=inv.dueDate||'';
+  $('f-terms').value=inv.terms||'Net 30';
+  $('f-status-label').value=computeBadge(inv).label;
+  $('f-disc').value=String(inv.discount||0);
+  updateEditorBadge();
+  $('f-gst').value=String(inv.gstRate||5);
+  $('f-notes').value=inv.notes||'';
+  lineItems=(inv.lineItems||[]).map(li=>({...li}));
+}
+
+function nextNum(){
+  const nums=invoices.map(i=>{const m=String(i.number||'').match(/(\d+)$/);return m?parseInt(m[1]):0;});
+  return 'INV-'+String((nums.length?Math.max(...nums):0)+1).padStart(3,'0');
+}
+
+// Line items
+function addLine(){
+  lineItems.push({service:'',customDesc:'',qty:1,unit:'',rate:0});
+  renderLines();calcTotals();
+}
+function removeLine(i){lineItems.splice(i,1);renderLines();calcTotals();}
+
+function renderLines(){
+  $('li-list').innerHTML=lineItems.map((li,i)=>{
+    const isOther=li.service==='__other';
+    const isDisc=li.service==='Discount';
+    const opts=`<option value="" disabled ${!li.service?'selected':''}>Select a service…</option>`+
+      SERVICES.map(s=>`<option value="${esc2(s.label)}" ${li.service===s.label?'selected':''}>${esc2(s.label)}</option>`).join('')+
+      `<option value="__other" ${isOther?'selected':''}>✏ Other — Manual Entry</option>`;
+    if(isDisc){
+      return `<div class="li-card">
+        <div class="li-desc" style="padding-right:28px;">
+          <select class="li-sel" onchange="onSvcChange(this,${i})">${opts}</select>
+        </div>
+        <div class="li-grid">
+          <div style="grid-column:span 2;">
+            <div class="li-lbl">Discount Amount ($)</div>
+            <input class="li-inp" type="number" value="${li.rate}" min="0" step="0.01" placeholder="0.00" oninput="lineItems[${i}].rate=parseFloat(this.value)||0;calcTotals();updateLineAmt(${i});">
+          </div>
+          <div style="grid-column:span 2;">
+            <div class="li-lbl">Deduction</div>
+            <div class="li-val" id="la-${i}" style="color:var(--red);">-${fmt(li.rate)}</div>
+          </div>
+        </div>
+        <button class="li-rm" onclick="removeLine(${i})">×</button>
+      </div>`;
+    }
+    return `<div class="li-card">
+      <div class="li-desc">
+        <select class="li-sel" onchange="onSvcChange(this,${i})">${opts}</select>
+        ${isOther?`<input class="li-inp" type="text" value="${esc2(li.customDesc)}" placeholder="Describe the service…" style="margin-top:8px;" oninput="lineItems[${i}].customDesc=this.value;calcTotals();">`:''}
+      </div>
+      <div class="li-grid">
+        <div>
+          <div class="li-lbl">Qty</div>
+          <input class="li-inp" type="number" value="${li.qty}" min="0" step="0.5" oninput="lineItems[${i}].qty=parseFloat(this.value)||0;calcTotals();updateLineAmt(${i});">
+        </div>
+        <div>
+          <div class="li-lbl">Unit</div>
+          <input class="li-inp" type="text" value="${esc2(li.unit)}" placeholder="hrs" oninput="lineItems[${i}].unit=this.value;">
+        </div>
+        <div>
+          <div class="li-lbl">Rate ($)</div>
+          <input class="li-inp" type="number" value="${li.rate}" min="0" step="0.01" oninput="lineItems[${i}].rate=parseFloat(this.value)||0;calcTotals();updateLineAmt(${i});">
+        </div>
+        <div>
+          <div class="li-lbl">Amount</div>
+          <div class="li-val" id="la-${i}">${fmt(li.qty*li.rate)}</div>
+        </div>
+      </div>
+      <button class="li-rm" onclick="removeLine(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+
+function onSvcChange(sel,i){
+  lineItems[i].service=sel.value;
+  if(sel.value==='__other'){lineItems[i].customDesc='';}
+  else{
+    const p=SERVICES.find(s=>s.label===sel.value);
+    if(p){lineItems[i].unit=p.unit;lineItems[i].rate=p.rate;}
+  }
+  renderLines();calcTotals();
+}
+function updateLineAmt(i){
+  const el=$(`la-${i}`);if(!el)return;
+  const li=lineItems[i];
+  if(li.service==='Discount'){el.textContent='-'+fmt(li.rate);el.style.color='var(--red)';}
+  else{el.textContent=fmt(li.qty*li.rate);el.style.color='var(--orange)';}
+}
+
+function calcTotals(){
+  let sub=lineItems.reduce((s,l)=>l.service==='Discount'?s-l.rate:s+l.qty*l.rate,0);
+  const disc=parseFloat(val('f-disc'))||0;
+  const gstR=(parseFloat(val('f-gst'))||5)/100;
+  const after=Math.max(0,sub-disc);
+  const gst=after*gstR;
+  const total=after+gst;
+  setText('t-sub',fmt(sub));
+  setText('t-disc',disc>0?'-'+fmt(disc):'$ -');
+  setText('t-gst',fmt(gst));
+  setText('t-bal',fmt(total));
+  // pre-fill email
+  const em=val('f-email');if(em&&!$('m-email').dataset.m)$('m-email').value=em;
+  const n=val('f-num');if(!$('m-subject').dataset.m)$('m-subject').value=`Invoice${n?' '+n:''} from Apex Terrain Management`;
+}
+
+function statusLabelToFields(label){
+  switch(label){
+    case 'Deposit Owing': return{projectStatus:'Won',  paymentStatus:'Deposit Owing', jobCompleted:false};
+    case 'Scheduled':     return{projectStatus:'Won',  paymentStatus:'Deposit Paid',  jobCompleted:false};
+    case 'Balance Owing': return{projectStatus:'Won',  paymentStatus:'Balance Owing', jobCompleted:true};
+    case 'Paid':          return{projectStatus:'Won',  paymentStatus:'Fully Paid',    jobCompleted:true};
+    case 'Lost':          return{projectStatus:'Lost', paymentStatus:'None',          jobCompleted:false};
+    default:              return{projectStatus:'Quote',paymentStatus:'None',          jobCompleted:false};
+  }
+}
+
+function updateEditorBadge(){
+  const label=$('f-status-label')?$('f-status-label').value:'Pending';
+  const b=computeBadge(statusLabelToFields(label));
+  const el=$('ed-badge-preview');
+  if(el)el.innerHTML=`<span class="badge ${b.cls}" style="font-size:12px;">${b.label}</span>`;
+}
+
+// Attach listeners to form fields
+['f-disc','f-gst'].forEach(id=>{const el=$(id);if(el)el.addEventListener('input',calcTotals);});
+$('m-email').addEventListener('input',function(){this.dataset.m='1';});
+$('m-subject').addEventListener('input',function(){this.dataset.m='1';});
+
+function buildInvObj(){
+  let sub=lineItems.reduce((s,l)=>l.service==='Discount'?s-l.rate:s+l.qty*l.rate,0);
+  const disc=parseFloat(val('f-disc'))||0;
+  const gstR=(parseFloat(val('f-gst'))||5)/100;
+  const after=Math.max(0,sub-disc);
+  const gst=after*gstR;
+  const fields=statusLabelToFields($('f-status-label')?$('f-status-label').value:'Pending');
+  return {
+    id:editingId||('inv_'+Date.now()),
+    number:val('f-num')||nextNum(),
+    date:val('f-date'),dueDate:val('f-due'),terms:val('f-terms'),
+    serviceCity:val('f-scity'),
+    projectStatus:fields.projectStatus, paymentStatus:fields.paymentStatus, jobCompleted:fields.jobCompleted,
+    customer:{name:val('f-name'),street:val('f-street'),city:val('f-city'),email:val('f-email')},
+    lineItems:lineItems.map(l=>({...l})),
+    notes:val('f-notes'),
+    discount:parseFloat(val('f-disc'))||0,
+    gstRate:parseFloat(val('f-gst'))||5,
+    subtotal:sub,gst,total:after+gst,
+    updatedAt:Date.now(),
+    createdAt:editingId?(invoices.find(i=>i.id===editingId)?.createdAt||Date.now()):Date.now()
+  };
+}
+
+async function saveInvoice(){
+  const inv=buildInvObj();
+  if(!editingId)editingId=inv.id;
+  try{
+    await invCol.doc(inv.id).set(inv);
+    syncToSheet(inv);
+    toast('Invoice saved!');
+    closeEditor();
+  }catch(e){toast('Save failed',false);}
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PREVIEW & PDF
+// ═══════════════════════════════════════════════════════════════
+function openPreview(){
+  renderPreviewHTML();
+  $('preview-modal').classList.add('open');
+}
+function closePreview(){$('preview-modal').classList.remove('open');}
+
+function renderPreviewHTML(){
+  const s=getS();
+  const inv=buildInvObj();
+  let sub=0;
+  const rows=inv.lineItems.map((li,i)=>{
+    const isDisc=li.service==='Discount';
+    const desc=li.service==='__other'?li.customDesc:li.service;
+    const amt=isDisc?-li.rate:li.qty*li.rate;
+    sub+=amt;
+    if(isDisc){
+      return `<tr style="background:${i%2===0?'#f9f9f9':'white'};border-bottom:1px solid #eee;">
+        <td style="padding:7px 12px;font-size:13px;color:#c0392b;font-style:italic;">${esc(desc)}</td>
+        <td style="padding:7px 12px;font-size:13px;text-align:center;color:#ccc;">—</td>
+        <td style="padding:7px 12px;font-size:13px;text-align:center;color:#ccc;">—</td>
+        <td style="padding:7px 12px;font-size:13px;text-align:right;color:#ccc;">—</td>
+        <td style="padding:7px 12px;font-size:13px;text-align:right;color:#c0392b;">-${fmt(li.rate)}</td>
+      </tr>`;
+    }
+    return `<tr style="background:${i%2===0?'#f9f9f9':'white'};border-bottom:1px solid #eee;">
+      <td style="padding:7px 12px;font-size:13px;">${esc(desc)}</td>
+      <td style="padding:7px 12px;font-size:13px;text-align:center;">${li.qty}</td>
+      <td style="padding:7px 12px;font-size:13px;text-align:center;">${esc(li.unit)}</td>
+      <td style="padding:7px 12px;font-size:13px;text-align:right;">${fmt(li.rate)}</td>
+      <td style="padding:7px 12px;font-size:13px;text-align:right;">${fmt(amt)}</td>
+    </tr>`;
+  }).join('');
+  const fillers=Array.from({length:Math.max(0,10-inv.lineItems.length)},(_,i)=>
+    `<tr style="background:${(inv.lineItems.length+i)%2===0?'#f9f9f9':'white'};border-bottom:1px solid #eee;">
+      <td style="padding:7px 12px;"></td>
+      <td style="padding:7px 12px;text-align:center;color:#ccc;">0</td>
+      <td style="padding:7px 12px;"></td>
+      <td style="padding:7px 12px;text-align:right;color:#ccc;">$0.00</td>
+      <td style="padding:7px 12px;text-align:right;color:#ccc;">$0.00</td>
+    </tr>`).join('');
+  const disc=inv.discount;const gst=inv.gst;const total=inv.total;
+
+  $('invoice-preview').innerHTML=`
+    <div style="background:#3d3d3d;padding:24px 32px;display:flex;justify-content:space-between;align-items:flex-start;">
+      <div style="color:white;font-size:13px;line-height:2;">
+        <div style="font-weight:500;">${esc(s.name||'Apex Terrain')}</div>
+        <div style="color:#ccc;">${esc(s.street||'')}</div>
+        <div style="color:#ccc;">${esc(s.city||'')}</div>
+        <div style="color:#ccc;">${esc(s.phone||'')}</div>
+        <div style="color:#6bb5ff;">${esc(s.email||'')}</div>
+      </div>
+      <img src="https://raw.githubusercontent.com/itsmeimei96/apexterrain/main/brand_assets/Logo.jpeg" style="height:100px;width:auto;">
+    </div>
+    <div style="height:6px;background:#f28c28;"></div>
+    <div style="height:100px;border-bottom:1px solid #f0f0f0;"></div>
+    <div style="padding:20px 32px;display:flex;justify-content:space-between;border-bottom:1px solid #f0f0f0;">
+      <div style="font-size:13px;line-height:2;">
+        <div style="font-weight:700;">INVOICE TO</div>
+        <div>${esc(inv.customer.name)}</div>
+        <div>${esc(inv.customer.street)}</div>
+        <div>${esc(inv.customer.city)}</div>
+      </div>
+      <div style="font-size:13px;line-height:2;text-align:right;">
+        <div><strong>INVOICE#</strong> ${esc(inv.number)}</div>
+        <div><strong>DATE</strong> ${fmtD(inv.date)||'—'}</div>
+        <div><strong>DUE DATE</strong> ${fmtD(inv.dueDate)||'—'}</div>
+        <div><strong>TERMS</strong> ${esc(inv.terms)}</div>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="background:#f28c28;">
+        <th class="inv-th" style="text-align:left;width:44%;">DESCRIPTION</th>
+        <th class="inv-th" style="text-align:center;width:10%;">QTY</th>
+        <th class="inv-th" style="text-align:center;width:11%;">Unit</th>
+        <th class="inv-th" style="text-align:right;width:15%;">RATE</th>
+        <th class="inv-th" style="text-align:right;width:20%;">AMOUNT</th>
+      </tr></thead>
+      <tbody>${rows}${fillers}</tbody>
+    </table>
+    <div style="display:flex;justify-content:space-between;padding:28px 32px;">
+      <div style="width:44%;">
+        <div style="font-size:12px;color:#555;font-weight:600;margin-bottom:8px;">Notes</div>
+        <div style="font-size:12px;color:#444;line-height:1.7;min-height:80px;padding:8px;border:1px solid #e0e0e0;">${esc(inv.notes)}</div>
+      </div>
+      <div style="width:46%;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #eee;"><td style="padding:7px 12px;font-weight:700;text-align:right;">SUBTOTAL</td><td style="padding:7px 12px;text-align:right;">${fmt(sub)}</td></tr>
+          <tr style="border-bottom:1px solid #eee;"><td style="padding:7px 12px;font-weight:700;text-align:right;">DISCOUNT</td><td style="padding:7px 12px;text-align:right;">${disc>0?'-'+fmt(disc):'$ -'}</td></tr>
+          <tr style="border-bottom:1px solid #eee;"><td style="padding:7px 12px;font-weight:700;text-align:right;">GST</td><td style="padding:7px 12px;text-align:right;">${fmt(gst)}</td></tr>
+          <tr style="border-bottom:1px solid #eee;"><td style="padding:7px 12px;font-weight:700;text-align:right;">TOTAL</td><td style="padding:7px 12px;text-align:right;">${fmt(total)}</td></tr>
+          <tr><td style="padding:10px 12px;font-weight:700;text-align:right;font-size:15px;border-top:2px solid #1a1a1a;">BALANCE DUE</td><td style="padding:10px 12px;text-align:right;font-weight:700;font-size:15px;border-top:2px solid #1a1a1a;">${fmt(total)}</td></tr>
+        </table>
+      </div>
+    </div>
+    <div style="margin:0 32px 20px;background:#f8f8f8;border:1px solid #e4e4e4;border-left:4px solid #f28c28;padding:16px 20px;border-radius:2px;">
+      <div style="font-family:'Oswald',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a1a;margin-bottom:10px;">Payment Instructions</div>
+      <div style="font-size:11.5px;color:#444;line-height:1.85;">
+        <div style="margin-bottom:5px;"><span style="font-weight:700;color:#1a1a1a;">Deposit Requirement: </span>A 50% deposit is required prior to the scheduled service date to confirm your booking.</div>
+        <div style="margin-bottom:5px;"><span style="font-weight:700;color:#1a1a1a;">Balance Due: </span>The remaining balance is due on the day of service.</div>
+        <div style="margin-bottom:5px;"><span style="font-weight:700;color:#1a1a1a;">Payment Methods: </span>We accept Cash or E-transfer.</div>
+        <div><span style="font-weight:700;color:#1a1a1a;">E-transfer Details: </span>Please send payments to <span style="color:#c47a1e;font-weight:600;">${esc(s.payEmail||s.email||'payment@apexterrain.ca')}</span></div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #ddd;padding:12px 32px;display:flex;justify-content:space-between;font-size:10.5px;color:#888;">
+      <div>GST Reg #: ${esc(s.gstReg||'')}</div>
+      <div>This invoice is brought to you by <strong style="color:#555;">Apex Terrain Management Ltd.</strong></div>
+    </div>`;
+}
+
+async function downloadPDF(){
+  await saveInvoice().catch(()=>{});
+  renderPreviewHTML();
+  const el=$('invoice-preview');
+  const num=val('f-num')||'invoice';
+  html2pdf().set({margin:0,filename:`Apex-${num}.pdf`,image:{type:'jpeg',quality:.97},html2canvas:{scale:2,useCORS:true,logging:false},jsPDF:{unit:'px',format:[816,1056],orientation:'portrait'}}).from(el).save();
+  toast('PDF downloaded!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EMAIL
+// ═══════════════════════════════════════════════════════════════
+function openEmailModal(){calcTotals();$('email-bg').classList.add('open');}
+function closeEmailModal(e){if(!e||e.target===$('email-bg'))$('email-bg').classList.remove('open');clearMStatus();}
+function clearMStatus(){$('m-status').style.display='none';}
+function showMStatus(type,msg){
+  const el=$('m-status');el.style.display='block';el.textContent=msg;
+  el.style.background=type==='ok'?'rgba(34,197,94,.15)':'rgba(248,113,113,.15)';
+  el.style.color=type==='ok'?'#22c55e':'#f87171';
+}
+
+async function sendEmail(){
+  const s=getS();
+  const to=$('m-email').value.trim();
+  if(!to){showMStatus('err','Enter a recipient email.');return;}
+  if(!s.key||!s.svc||!s.tpl){showMStatus('err','EmailJS not configured. Open Settings ⚙');return;}
+  const btn=$('btn-send-email');btn.textContent='Sending…';btn.disabled=true;
+  try{
+    renderPreviewHTML();
+    emailjs.init({publicKey:s.key});
+    await emailjs.send(s.svc,s.tpl,{
+      to_email:to,
+      to_name:val('f-name')||'Customer',
+      from_name:s.name||'Apex Terrain Management',
+      subject:$('m-subject').value,
+      message:$('m-msg').value,
+      invoice_html:$('invoice-preview').innerHTML,
+      invoice_number:val('f-num'),
+      invoice_total:$('t-bal').textContent,
+      invoice_due:fmtD(val('f-due')),
+      reply_to:s.email||''
+    });
+    await saveInvoice().catch(()=>{});
+    showMStatus('ok','✓ Invoice sent!');
+    setTimeout(()=>{closeEmailModal();toast('Invoice sent to '+to);},1800);
+  }catch(e){
+    const msg=e.text||e.message||JSON.stringify(e);
+    showMStatus('err','Send failed: '+msg);
+    console.error('EmailJS error:',e);
+  }
+  finally{btn.textContent='Send Invoice';btn.disabled=false;}
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  REPORTS TAB
+// ═══════════════════════════════════════════════════════════════
+function shiftMonth(d){reportMonth=new Date(reportMonth);reportMonth.setMonth(reportMonth.getMonth()+d);renderReports();}
+
+function renderReports(){
+  const y=reportMonth.getFullYear(),m=reportMonth.getMonth();
+  setText('month-lbl',reportMonth.toLocaleDateString('en-CA',{month:'long',year:'numeric'}));
+
+  const monthInvs=invoices.filter(i=>{
+    if(!i.date)return false;
+    const d=new Date(i.date+'T00:00:00');
+    return d.getFullYear()===y&&d.getMonth()===m&&computeBadge(i).label!=='Lost';
+  });
+
+  const rev=monthInvs.reduce((s,i)=>s+(i.total||0),0);
+  const jobs=monthInvs.length;
+  setText('rep-rev',fmtM(rev));
+  setText('rep-jobs',String(jobs));
+  setText('rep-avg',jobs?fmtM(rev/jobs):'$0');
+
+  // City chart
+  const cityMap={};
+  monthInvs.forEach(i=>{
+    const c=i.serviceCity||'Unspecified';
+    cityMap[c]=(cityMap[c]||0)+(i.total||0);
+  });
+  const sorted=Object.entries(cityMap).sort((a,b)=>b[1]-a[1]);
+  const chartEl=$('city-chart');
+  if(!sorted.length){
+    chartEl.innerHTML=`<div class="empty" style="padding:24px 0;"><div style="font-size:36px;margin-bottom:8px;">📍</div><p>No job data this month.<br>Add a <strong>Service City</strong> to your invoices.</p></div>`;
+    return;
+  }
+  const max=sorted[0][1]||1;
+  chartEl.innerHTML=sorted.map(([city,rev])=>`
+    <div class="bar-row">
+      <div class="bar-top">
+        <span class="bar-city">${esc(city)}</span>
+        <span class="bar-rev">${fmtM(rev)}</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(rev/max*100).toFixed(1)}%"></div></div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RECEIPTS TAB — OCR
+// ═══════════════════════════════════════════════════════════════
+async function handleScan(input){
+  if(!input.files||!input.files[0])return;
+  const file=input.files[0];
+  input.value='';
+  $('scan-wrap').style.display='block';
+  $('r-form').style.display='none';
+  $('prog-fill').style.width='0%';
+  setText('scan-sub','Loading OCR engine…');
+
+  try{
+    const {data:{text}}=await Tesseract.recognize(file,'eng',{
+      logger:m=>{
+        if(m.status==='recognizing text'){
+          $('prog-fill').style.width=(m.progress*100).toFixed(0)+'%';
+          setText('scan-sub',`Reading text… ${(m.progress*100).toFixed(0)}%`);
+        } else {
+          setText('scan-sub',m.status);
+        }
+      }
+    });
+    $('scan-wrap').style.display='none';
+    populateReceiptForm(parseReceipt(text));
+    $('r-form').style.display='block';
+  }catch(e){
+    $('scan-wrap').style.display='none';
+    toast('OCR failed — try manual entry',false);
+    openManualReceipt();
+  }
+}
+
+function parseReceipt(text){
+  const totalMatch=text.match(/(?:total|amount due|balance|grand total)[^\d]*\$?\s*([\d,]+\.?\d{0,2})/i);
+  const dateMatch =text.match(/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/);
+  const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>2);
+  const vendor=lines[0]||'';
+  const total=totalMatch?parseFloat(totalMatch[1].replace(',','')):'';
+  let date='';
+  if(dateMatch){try{const d=new Date(dateMatch[1]);if(!isNaN(d))date=d.toISOString().split('T')[0];}catch(_){}}
+  return{vendor,total,date,category:suggestCat(text)};
+}
+
+function suggestCat(t){
+  t=t.toLowerCase();
+  if(/gas|diesel|fuel|petro|shell|esso|chevron|husky|muffler|tire|auto|brake/.test(t))return'Transportation';
+  if(/home depot|rona|canadian tire|tool|part|lumber|mulch|supplies|hardware|seed/.test(t))return'Supplies';
+  if(/tim horton|mcdonald|subway|restaurant|coffee|food|hotel|motel|holiday inn/.test(t))return'Food & Travel';
+  if(/rental|rent|equipment|lease|caterpillar|bobcat/.test(t))return'Equipment';
+  return'Other';
+}
+
+function populateReceiptForm(data){
+  $('r-vendor').value=data.vendor||'';
+  $('r-total').value=data.total||'';
+  $('r-date').value=data.date||new Date().toISOString().split('T')[0];
+  $('r-cat').value=data.category||'Other';
+  $('r-notes').value='';
+}
+
+function openManualReceipt(){
+  populateReceiptForm({date:new Date().toISOString().split('T')[0]});
+  $('r-form').style.display='block';
+}
+
+function cancelScan(){
+  $('scan-wrap').style.display='none';
+  $('r-form').style.display='none';
+}
+
+async function saveReceipt(){
+  const vendor=$('r-vendor').value.trim();
+  const total=parseFloat($('r-total').value)||0;
+  if(!vendor){toast('Enter a vendor name',false);return;}
+  const exp={
+    id:'exp_'+Date.now(),
+    vendor,total,date:$('r-date').value,
+    category:$('r-cat').value,notes:$('r-notes').value.trim(),
+    createdAt:Date.now()
+  };
+  try{
+    await expCol.doc(exp.id).set(exp);
+    $('r-form').style.display='none';
+    toast('Expense saved!');
+    renderExpenses();
+  }catch(e){toast('Save failed',false);}
+}
+
+function renderExpenses(){
+  const el=$('expense-list');
+  if(!expenses.length){
+    el.innerHTML=`<div class="empty" style="padding:24px 0;"><div style="font-size:36px;margin-bottom:8px;">🧾</div><p>No receipts saved yet.<br>Tap <strong>Scan Receipt</strong> to get started.</p></div>`;
+    return;
+  }
+  const catColor={'Transportation':'Transportation','Supplies':'Supplies','Food & Travel':'Food','Equipment':'Equipment','Other':'Other'};
+  el.innerHTML=expenses.map(e=>`
+    <div class="exp-card">
+      <div class="exp-dot ${catColor[e.category]||'Other'}"></div>
+      <div class="exp-body">
+        <div class="exp-vendor">${esc(e.vendor)}</div>
+        <div class="exp-meta">${fmtD(e.date)||'—'} · ${esc(e.category)}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="exp-amt">${fmtM(e.total)}</span>
+        <button style="background:none;border:none;color:#555;cursor:pointer;font-size:14px;" onclick="deleteItem('${e.id}','expense')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function exportCSV(){
+  if(!expenses.length){toast('No expenses to export',false);return;}
+  const header=['Date','Vendor','Total','Category','Notes'];
+  const rows=expenses.map(e=>[e.date,e.vendor,e.total,e.category,e.notes].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv=[header.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`Apex-Expenses-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('CSV exported!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DELETE CONFIRM
+// ═══════════════════════════════════════════════════════════════
+function deleteItem(id,type){
+  pendingDelId=id;pendingDelType=type;
+  if(type==='invoice'){
+    const inv=invoices.find(i=>i.id===id);
+    $('confirm-msg').innerHTML=`Delete invoice <strong>${esc(inv?.number||id)}</strong>${inv?.customer?.name?' for <strong>'+esc(inv.customer.name)+'</strong>':''}? Cannot be undone.`;
+  } else {
+    const ex=expenses.find(e=>e.id===id);
+    $('confirm-msg').innerHTML=`Delete expense: <strong>${esc(ex?.vendor||id)}</strong>?`;
+  }
+  $('confirm-bg').classList.add('open');
+  $('confirm-bg').style.display='flex';
+}
+function confirmNo(){$('confirm-bg').style.display='none';pendingDelId=null;}
+async function confirmYes(){
+  if(!pendingDelId){return;}
+  const id=pendingDelId,type=pendingDelType;
+  pendingDelId=null;
+  $('confirm-bg').style.display='none';
+  try{
+    if(type==='invoice')await invCol.doc(id).delete();
+    else await expCol.doc(id).delete();
+    toast('Deleted.');
+  }catch(e){toast('Delete failed',false);}
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GOOGLE SHEETS SYNC
+// ═══════════════════════════════════════════════════════════════
+function getSheetUrl(){return (getS().sheetsUrl||GAS_URL).trim();}
+
+// Build a minimal row object from a full invoice
+function invToRow(inv){
+  return{
+    id:     inv.id,
+    name:   inv.customer?.name||'',
+    email:  inv.customer?.email||'',
+    address:inv.customer?.street||'',
+    status: computeBadge(inv).label,
+    total:  inv.total||0,
+    date:   inv.date||''
+  };
+}
+
+// Fire-and-forget POST to Apps Script; queues if offline
+async function syncToSheet(inv){
+  const url=getSheetUrl();
+  if(!url)return;
+  const row=invToRow(inv);
+  if(!navigator.onLine){enqueueRow(row);updateSyncDot();return;}
+  try{
+    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(row)});
+    setSyncDot('synced');
+  }catch{enqueueRow(row);setSyncDot('pending');}
+}
+
+// Flush the offline queue when back online
+async function flushSheetQueue(){
+  const url=getSheetUrl();
+  if(!url||!navigator.onLine)return;
+  const q=JSON.parse(localStorage.getItem('apex-sheet-q')||'[]');
+  if(!q.length)return;
+  try{
+    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(q)});
+    localStorage.removeItem('apex-sheet-q');
+    setSyncDot('synced');
+  }catch{}
+}
+
+function enqueueRow(row){
+  const q=JSON.parse(localStorage.getItem('apex-sheet-q')||'[]');
+  const idx=q.findIndex(r=>r.id===row.id);
+  if(idx>=0)q[idx]=row;else q.push(row);
+  localStorage.setItem('apex-sheet-q',JSON.stringify(q));
+}
+
+function setSyncDot(state){
+  document.querySelectorAll('.sync-dot').forEach(d=>{
+    d.className='sync-dot '+state;
+    d.title=state==='synced'?'Synced with Google Sheets':state==='pending'?'Pending sync (offline)':'';
+  });
+}
+function updateSyncDot(){
+  const q=JSON.parse(localStorage.getItem('apex-sheet-q')||'[]');
+  setSyncDot(q.length?'pending':'synced');
+}
+
+// GET Invoice_Database → reconcile status with Firebase
+async function fetchSheetInvoices(){
+  const url=getSheetUrl();
+  if(!url||!navigator.onLine)return;
+  try{
+    const r=await fetch(url+'?tab=invoices');
+    const data=await r.json();
+    if(!Array.isArray(data.rows))return;
+    let imported=0;
+    for(const row of data.rows){
+      if(!row.id)continue;
+      const inv=invoices.find(i=>i.id===row.id);
+      if(!inv){
+        // Only import rows that have name + email + address
+        if(!row.name||!row.email||!row.address)continue;
+        // Row exists in sheet but not Firebase — import it
+        const fields=statusLabelToFields(String(row.status||'').trim());
+        const now=Date.now();
+        const newInv={
+          id:row.id,
+          number:row.id,
+          date:row.date||'',
+          dueDate:'',
+          terms:'Net 30',
+          serviceCity:'',
+          projectStatus:fields.projectStatus,
+          paymentStatus:fields.paymentStatus,
+          jobCompleted:fields.jobCompleted,
+          customer:{name:row.name||'',street:row.address||'',city:'',email:row.email||''},
+          lineItems:[],
+          notes:'Imported from Google Sheets',
+          discount:0,gstRate:5,
+          subtotal:Number(row.total)||0,gst:0,
+          total:Number(row.total)||0,
+          createdAt:now,updatedAt:now
+        };
+        invCol.doc(row.id).set(newInv).catch(()=>{});
+        imported++;
+      } else {
+        // Row already in Firebase — reconcile status if sheet differs
+        const currentLabel=computeBadge(inv).label;
+        const sheetLabel=String(row.status||'').trim();
+        if(sheetLabel && sheetLabel!==currentLabel){
+          const fields=statusLabelToFields(sheetLabel);
+          invCol.doc(row.id).update({...fields,updatedAt:Date.now()}).catch(()=>{});
+        }
+      }
+    }
+    if(imported>0)toast(`Imported ${imported} invoice${imported!==1?'s':''} from Sheets`);
+  }catch(e){console.error('Sheet fetch failed',e);}
+}
+
+// GET Form Submissions tab → populate formSubmissions cache
+async function fetchFormSubmissions(){
+  const url=getSheetUrl();
+  if(!url)return;
+  try{
+    const r=await fetch(url+'?tab=forms');
+    const data=await r.json();
+    formSubmissions=Array.isArray(data.rows)?data.rows:[];
+  }catch{formSubmissions=[];}
+}
+
+// Form search modal helpers
+function openFormSearch(){
+  $('fsearch-list').innerHTML='<p style="text-align:center;color:var(--text3);font-size:13px;padding:16px 0;">Loading…</p>';
+  $('fsearch-q').value='';
+  $('fsearch-bg').classList.add('open');
+  if(!getSheetUrl()){
+    $('fsearch-list').innerHTML='<p style="text-align:center;color:var(--text3);font-size:13px;padding:16px 0;">Add your Apps Script URL in Settings first.</p>';
+    return;
+  }
+  fetchFormSubmissions().then(()=>filterFormSearch(''));
+}
+function closeFSearch(e){if(!e||e.target===$('fsearch-bg'))$('fsearch-bg').classList.remove('open');}
+
+// Field name heuristics for flexible Form Submissions column mapping
+function gv(row,keys){for(const k of keys){const v=row[k];if(v!==undefined&&v!=='')return String(v);}return'';}
+function rowName(r){return gv(r,['name','customer_name','full_name','your_name','contact_name','client_name']);}
+function rowEmail(r){return gv(r,['email','email_address','your_email','contact_email']);}
+function rowStreet(r){return gv(r,['address','street','street_address','service_address','civic_address','location']);}
+function rowCity(r){return gv(r,['city','service_city','municipality','town']);}
+
+function filterFormSearch(q){
+  q=(q||'').toLowerCase();
+  const list=q
+    ?formSubmissions.filter(r=>rowName(r).toLowerCase().includes(q)||rowEmail(r).toLowerCase().includes(q))
+    :formSubmissions;
+  const el=$('fsearch-list');
+  if(!list.length){
+    el.innerHTML=`<p style="text-align:center;color:var(--text3);font-size:13px;padding:16px 0;">${
+      formSubmissions.length?'No matches found.':'No submissions found — check your Apps Script URL in Settings.'
+    }</p>`;
+    return;
+  }
+  el.innerHTML=list.slice(0,40).map(r=>{
+    const idx=formSubmissions.indexOf(r);
+    const name=rowName(r)||'Unknown';
+    const email=rowEmail(r);
+    const street=rowStreet(r);
+    return `<div class="fsearch-item" onclick="fillFromForm(${idx})">
+      <div class="fsearch-name">${esc(name)}</div>
+      <div class="fsearch-sub">${[email,street].filter(Boolean).map(esc).join(' · ')||'—'}</div>
+    </div>`;
+  }).join('');
+}
+
+function fillFromForm(idx){
+  const r=formSubmissions[idx];
+  if(!r)return;
+  const name=rowName(r),email=rowEmail(r),street=rowStreet(r),city=rowCity(r);
+  if(name)  $('f-name').value=name;
+  if(email) $('f-email').value=email;
+  if(street)$('f-street').value=street;
+  if(city)  $('f-city').value=city;
+  closeFSearch();
+  calcTotals();
+}
+
+window.addEventListener('online', ()=>{flushSheetQueue();fetchSheetInvoices();});
+
+// ═══════════════════════════════════════════════════════════════
+//  FIRESTORE REAL-TIME SYNC
+// ═══════════════════════════════════════════════════════════════
+async function purgeEmptyInvoices(){
+  try{
+    const snap=await invCol.get();
+    const toDelete=snap.docs.filter(doc=>{
+      const c=doc.data().customer||{};
+      return !c.name&&!c.email&&!c.street;
+    });
+    if(!toDelete.length)return;
+    const batch=db.batch();
+    toDelete.forEach(doc=>batch.delete(doc.ref));
+    await batch.commit();
+    toast(`Removed ${toDelete.length} empty invoice${toDelete.length!==1?'s':''}`);
+  }catch(e){console.error('Purge failed',e);}
+}
+
+function startSync(){
+  // Invoices
+  invCol.onSnapshot(snap=>{
+    invoices=snap.docs.map(d=>d.data());
+    invoices.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    renderInvoiceList(invoices);
+    renderHome();
+    if(currentTab==='reports')renderReports();
+  },()=>toast('Sync error',false));
+
+  // Expenses
+  expCol.onSnapshot(snap=>{
+    expenses=snap.docs.map(d=>d.data());
+    expenses.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    if(currentTab==='receipts')renderExpenses();
+  },()=>{});
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+loadSettings();
+switchTab('home');
+startSync();
+purgeEmptyInvoices();
+flushSheetQueue();
+updateSyncDot();
+</script>
+</body>
+</html>
