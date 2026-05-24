@@ -289,19 +289,43 @@
       <!-- Right: hero image card -->
       <div class="relative hidden lg:block">
         <div class="relative rounded-sm overflow-hidden orange-glow" style="aspect-ratio: 4/3; border: 1px solid rgba(242,140,40,0.2);">
-          <img src="https://placehold.co/800x600/1a1a1a/333333?text=Project+Gallery+Coming+Soon" alt="Apex Terrain project gallery coming soon" class="w-full h-full object-cover" style="mix-blend-mode: normal;" />
-          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(26,26,26,0.8) 0%, rgba(26,26,26,0.1) 60%, transparent 100%);"></div>
-          <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(242,140,40,0.15) 0%, transparent 50%); mix-blend-mode: multiply;"></div>
+          <!-- Slideshow images -->
+          <img id="hero-slide-0" src="brand_assets/Gallery 1.jpg" alt="Apex Terrain project" class="w-full h-full object-cover absolute inset-0" style="opacity: 1; transition: opacity 0.9s ease;" />
+          <img id="hero-slide-1" src="brand_assets/Gallery 2.jpg" alt="Apex Terrain project" class="w-full h-full object-cover absolute inset-0" style="opacity: 0; transition: opacity 0.9s ease;" />
+          <img id="hero-slide-2" src="brand_assets/Gallery 3.jpg" alt="Apex Terrain project" class="w-full h-full object-cover absolute inset-0" style="opacity: 0; transition: opacity 0.9s ease;" />
+          <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(26,26,26,0.8) 0%, rgba(26,26,26,0.1) 60%, transparent 100%); z-index: 1;"></div>
+          <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(242,140,40,0.15) 0%, transparent 50%); mix-blend-mode: multiply; z-index: 2;"></div>
           <!-- Bottom label -->
-          <div class="absolute bottom-0 left-0 right-0 p-6">
+          <div class="absolute bottom-0 left-0 right-0 p-6" style="z-index: 3;">
             <p class="font-heading-md text-white" style="font-size: 1.4rem;">Tight Access Specialists</p>
             <p class="text-white/50 text-sm mt-1" style="font-weight: 300;">Where others can't go — we deliver</p>
           </div>
+          <!-- Dot indicators -->
+          <div class="absolute bottom-4 right-6 flex gap-2" style="z-index: 3;">
+            <span class="hero-dot" data-idx="0" style="width:7px;height:7px;border-radius:50%;background:#f28c28;display:inline-block;cursor:pointer;transition:opacity 0.3s ease;opacity:1;"></span>
+            <span class="hero-dot" data-idx="1" style="width:7px;height:7px;border-radius:50%;background:#f28c28;display:inline-block;cursor:pointer;transition:opacity 0.3s ease;opacity:0.35;"></span>
+            <span class="hero-dot" data-idx="2" style="width:7px;height:7px;border-radius:50%;background:#f28c28;display:inline-block;cursor:pointer;transition:opacity 0.3s ease;opacity:0.35;"></span>
+          </div>
           <!-- Corner accent -->
-          <div class="absolute top-0 left-0 w-12 h-12" style="background: linear-gradient(135deg, rgba(242,140,40,0.6) 0%, transparent 60%);"></div>
+          <div class="absolute top-0 left-0 w-12 h-12" style="background: linear-gradient(135deg, rgba(242,140,40,0.6) 0%, transparent 60%); z-index: 3;"></div>
         </div>
-
       </div>
+      <script>
+        (function(){
+          var total = 3, cur = 0;
+          function goTo(n) {
+            document.getElementById('hero-slide-' + cur).style.opacity = '0';
+            document.querySelectorAll('.hero-dot')[cur].style.opacity = '0.35';
+            cur = n % total;
+            document.getElementById('hero-slide-' + cur).style.opacity = '1';
+            document.querySelectorAll('.hero-dot')[cur].style.opacity = '1';
+          }
+          document.querySelectorAll('.hero-dot').forEach(function(dot) {
+            dot.addEventListener('click', function(){ goTo(parseInt(this.dataset.idx)); });
+          });
+          setInterval(function(){ goTo(cur + 1); }, 4000);
+        })();
+      </script>
     </div>
 
     <!-- Scroll indicator -->
