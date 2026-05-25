@@ -186,13 +186,6 @@
     /* Orange gradient glow */
     .orange-glow { box-shadow: 0 0 80px rgba(242,140,40,0.15), 0 0 160px rgba(242,140,40,0.06); }
 
-    /* Testimonial card */
-    .testimonial-card {
-      background: #222222; border: 1px solid rgba(255,255,255,0.06);
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    .testimonial-card:hover { transform: translateY(-4px); border-color: rgba(242,140,40,0.25); }
-
     /* Mobile menu */
     #mobile-menu { transition: opacity 0.2s ease, transform 0.2s ease; }
     #mobile-menu.hidden { opacity: 0; pointer-events: none; transform: translateY(-8px); }
@@ -216,7 +209,6 @@
         <a href="#service-areas" class="nav-link">Areas</a>
         <a href="#about" class="nav-link">About</a>
         <a href="#process" class="nav-link">Our Process</a>
-        <a href="#testimonials" class="nav-link">Reviews</a>
         <a href="#contact" class="btn-primary text-sm" style="padding: 10px 24px;">Free Quote</a>
       </div>
 
@@ -237,7 +229,6 @@
         <a href="#services" class="nav-link" onclick="closeMobileMenu()">Services</a>
         <a href="#about" class="nav-link" onclick="closeMobileMenu()">About</a>
         <a href="#process" class="nav-link" onclick="closeMobileMenu()">Our Process</a>
-        <a href="#testimonials" class="nav-link" onclick="closeMobileMenu()">Reviews</a>
         <a href="#contact" class="btn-primary self-start mt-2" onclick="closeMobileMenu()">Free Quote</a>
       </div>
     </div>
@@ -632,78 +623,6 @@
     </div>
   </section>
 
-  <!-- ═══════════════ TESTIMONIALS ═══════════════ -->
-  <section id="testimonials" class="py-28 px-6 lg:px-12 relative" style="background: #161616;">
-    <div class="absolute inset-0 topo-lines opacity-30"></div>
-    <div class="absolute inset-0" style="background: radial-gradient(ellipse 50% 60% at 20% 50%, rgba(242,140,40,0.04) 0%, transparent 70%);"></div>
-
-    <div class="relative z-10 max-w-7xl mx-auto">
-      <div class="text-center mb-16">
-        <p class="section-label mb-4">Client Reviews</p>
-        <h2 class="font-heading text-white" style="font-size: clamp(2.5rem, 5vw, 4rem);">Trusted by BC Property Owners</h2>
-        <div class="mt-4 mx-auto" style="width: 60px; height: 3px; background: #f28c28;"></div>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-6">
-
-        <div class="testimonial-card p-8 flex flex-col gap-6">
-          <div class="flex gap-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
-          <p class="text-white/65 flex-1" style="line-height: 1.8; font-size: 0.95rem; font-weight: 300; font-style: italic;">"Apex tackled our steep hillside property that two other contractors refused to quote. The job was done in two days — clean, professional, exactly what we needed for our fire interface plan."</p>
-          <div class="border-t border-white/10 pt-5 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-sm flex items-center justify-center font-heading-md text-sm" style="background: rgba(242,140,40,0.2); color: #f28c28;">JM</div>
-            <div>
-              <p class="font-heading-md text-white" style="font-size: 0.9rem;">James M.</p>
-              <p class="text-white/40" style="font-size: 0.78rem;">Coquitlam, BC</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card p-8 flex flex-col gap-6" style="border-color: rgba(242,140,40,0.2);">
-          <div class="flex gap-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
-          <p class="text-white/65 flex-1" style="line-height: 1.8; font-size: 0.95rem; font-weight: 300; font-style: italic;">"Called Apex after the November storms hit our acreage hard. They were on-site within 48 hours and completely cleared the fallen trees and debris. Fantastic communication throughout."</p>
-          <div class="border-t border-white/10 pt-5 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-sm flex items-center justify-center font-heading-md text-sm" style="background: rgba(242,140,40,0.2); color: #f28c28;">SR</div>
-            <div>
-              <p class="font-heading-md text-white" style="font-size: 0.9rem;">Sarah R.</p>
-              <p class="text-white/40" style="font-size: 0.78rem;">Mission, BC</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card p-8 flex flex-col gap-6">
-          <div class="flex gap-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f28c28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
-          <p class="text-white/65 flex-1" style="line-height: 1.8; font-size: 0.95rem; font-weight: 300; font-style: italic;">"We hired Apex for clearing a new development site. Their team was efficient, safe, and left the site in better shape than we expected. Would absolutely hire again for our next project."</p>
-          <div class="border-t border-white/10 pt-5 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-sm flex items-center justify-center font-heading-md text-sm" style="background: rgba(242,140,40,0.2); color: #f28c28;">DT</div>
-            <div>
-              <p class="font-heading-md text-white" style="font-size: 0.9rem;">Derek T.</p>
-              <p class="text-white/40" style="font-size: 0.78rem;">Chilliwack, BC</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
   <!-- ═══════════════ CTA BANNER ═══════════════ -->
   <section class="py-20 px-6 lg:px-12 relative overflow-hidden" style="background: #f28c28;">
     <div class="absolute inset-0" style="background: radial-gradient(ellipse 80% 100% at 100% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);"></div>
@@ -1059,7 +978,6 @@
           <ul class="flex flex-col gap-2">
             <li><a href="#about" class="text-white/40" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">About Us</a></li>
             <li><a href="#process" class="text-white/40" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Our Process</a></li>
-            <li><a href="#testimonials" class="text-white/40" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Reviews</a></li>
             <li><a href="#contact" class="text-white/40" style="font-size: 0.9rem; font-weight: 300; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f28c28'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Contact</a></li>
           </ul>
         </div>
@@ -1267,7 +1185,7 @@
         }
       });
     }, { threshold: 0.1 });
-    document.querySelectorAll('.service-card, .testimonial-card').forEach(el => {
+    document.querySelectorAll('.service-card').forEach(el => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(24px)';
       el.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s ease, box-shadow 0.25s ease';
