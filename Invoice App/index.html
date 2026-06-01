@@ -13,6 +13,7 @@
   <title>APEX Operations</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -588,10 +589,13 @@ const FB_CFG = {
   appId:"1:340911188880:web:f57772010c891846982115"
 };
 firebase.initializeApp(FB_CFG);
+const auth   = firebase.auth();
 const db     = firebase.firestore();
 const invCol = db.collection('invoices');
 const expCol = db.collection('expenses');
 db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+// Sign in anonymously so Firestore rules can require auth
+auth.signInAnonymously().catch(()=>{});
 
 // ═══════════════════════════════════════════════════════════════
 //  CONSTANTS
