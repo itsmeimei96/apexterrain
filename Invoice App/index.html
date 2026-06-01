@@ -848,11 +848,11 @@ async function qaAction(actionId){
   $('qa-bg').classList.remove('open');
   const idForSync=qaInvId;
   try{
-    await invCol.doc(idForSync).update(updates);
+    await invCol.doc(idForSync).set(updates,{merge:true});
     const inv=invoices.find(i=>i.id===idForSync);
     if(inv) syncToSheet(Object.assign({},inv,updates));
     toast('Updated!');
-  }catch(e){toast('Update failed',false);}
+  }catch(e){toast('Update failed: '+e.code,false);console.error(e);}
   qaInvId=null;
 }
 
@@ -1057,7 +1057,7 @@ async function saveInvoice(){
     syncToSheet(inv);
     toast('Invoice saved!');
     closeEditor();
-  }catch(e){toast('Save failed',false);}
+  }catch(e){toast('Save failed: '+e.code,false);console.error(e);}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1416,7 +1416,7 @@ async function confirmYes(){
     if(type==='invoice')await invCol.doc(id).delete();
     else await expCol.doc(id).delete();
     toast('Deleted.');
-  }catch(e){toast('Delete failed',false);}
+  }catch(e){toast('Delete failed: '+e.code,false);console.error(e);}
 }
 
 // ═══════════════════════════════════════════════════════════════
