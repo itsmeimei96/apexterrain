@@ -511,13 +511,13 @@ select.ed-field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
       <div class="form-grp"><label class="label">Template ID</label><input id="s-ej-tpl" class="field" type="text"></div>
       <div class="form-grp"><label class="label">Public Key</label><input id="s-ej-key" class="field" type="text"></div>
     </div>
-    <button class="btn btn-orange btn-full" onclick="saveSettings()">Save Settings</button>
-    <button class="btn btn-surface btn-full" style="margin-top:10px;" onclick="closeSettings()">Cancel</button>
-    <div style="margin-top:20px;padding:14px;border-radius:10px;background:var(--red-bg);border:1px solid rgba(248,113,113,.25);">
+    <div style="margin-bottom:16px;padding:14px;border-radius:10px;background:var(--red-bg);border:1px solid rgba(248,113,113,.25);">
       <div class="sheet-sec-title" style="color:var(--red);margin-bottom:8px;">⚠️ Danger Zone</div>
       <button class="btn btn-red btn-full" onclick="resetAndImport()">🔄 Clear All Data & Re-import from Sheet</button>
       <div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.6;">Deletes all local invoices and reimports fresh data from your Google Sheet. Cannot be undone.</div>
     </div>
+    <button class="btn btn-orange btn-full" onclick="saveSettings()">Save Settings</button>
+    <button class="btn btn-surface btn-full" style="margin-top:10px;" onclick="closeSettings()">Cancel</button>
   </div>
 </div>
 
