@@ -1,4 +1,4 @@
-const CACHE = 'apex-ops-v1';
+const CACHE = 'apex-ops-v5';
 const SHELL = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
