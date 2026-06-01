@@ -1418,13 +1418,16 @@ function getSheetUrl(){return (getS().sheetsUrl||GAS_URL).trim();}
 // Build a minimal row object from a full invoice
 function invToRow(inv){
   return{
-    id:     inv.id,
-    name:   inv.customer?.name||'',
-    email:  inv.customer?.email||'',
-    address:inv.customer?.street||'',
-    status: computeBadge(inv).label,
-    total:  inv.total||0,
-    date:   inv.date||''
+    id:       inv.id,
+    name:     inv.customer?.name||'',
+    email:    inv.customer?.email||'',
+    address:  inv.customer?.street||'',
+    status:   computeBadge(inv).label,
+    total:    inv.total||0,
+    date:     inv.date||'',
+    phone:    inv.customer?.phone||'',
+    services: inv.services||'',
+    details:  inv.notes||''
   };
 }
 
@@ -1499,9 +1502,10 @@ async function fetchSheetInvoices(){
           projectStatus:fields.projectStatus,
           paymentStatus:fields.paymentStatus,
           jobCompleted:fields.jobCompleted,
-          customer:{name:row.name||'',street:row.address||'',city:'',email:row.email||''},
+          customer:{name:row.name||'',street:row.address||'',city:'',email:row.email||'',phone:row.phone||''},
+          services:row.services||'',
           lineItems:[],
-          notes:'Imported from Google Sheets',
+          notes:row.details||'',
           discount:0,gstRate:5,
           subtotal:Number(row.total)||0,gst:0,
           total:Number(row.total)||0,
@@ -1549,8 +1553,17 @@ function closeFSearch(e){if(!e||e.target===$('fsearch-bg'))$('fsearch-bg').class
 
 // Field name heuristics for flexible Form Submissions column mapping
 function gv(row,keys){for(const k of keys){const v=row[k];if(v!==undefined&&v!=='')return String(v);}return'';}
-function rowName(r){return gv(r,['name','customer_name','full_name','your_name','contact_name','client_name']);}
+function rowName(r){
+  // Handle first_name + last_name from Apex sheet
+  const first=gv(r,['first_name','firstname']);
+  const last=gv(r,['last_name','lastname']);
+  if(first||last) return (first+' '+last).trim();
+  return gv(r,['name','customer_name','full_name','your_name','contact_name','client_name']);
+}
 function rowEmail(r){return gv(r,['email','email_address','your_email','contact_email']);}
+function rowPhone(r){return gv(r,['phone','phone_number','telephone','mobile']);}
+function rowServices(r){return gv(r,['services','service','services_required','service_type']);}
+function rowDetails(r){return gv(r,['details','notes','project_details','message','description']);}
 function rowStreet(r){return gv(r,['address','street','street_address','service_address','civic_address','location']);}
 function rowCity(r){return gv(r,['city','service_city','municipality','town']);}
 
@@ -1581,11 +1594,14 @@ function filterFormSearch(q){
 function fillFromForm(idx){
   const r=formSubmissions[idx];
   if(!r)return;
-  const name=rowName(r),email=rowEmail(r),street=rowStreet(r),city=rowCity(r);
-  if(name)  $('f-name').value=name;
-  if(email) $('f-email').value=email;
-  if(street)$('f-street').value=street;
-  if(city)  $('f-city').value=city;
+  const name=rowName(r),email=rowEmail(r),street=rowStreet(r),city=rowCity(r),phone=rowPhone(r),services=rowServices(r),details=rowDetails(r);
+  if(name)    $('f-name').value=name;
+  if(email)   $('f-email').value=email;
+  if(street)  $('f-street').value=street;
+  if(city)    $('f-city').value=city;
+  if(phone&&$('f-phone'))   $('f-phone').value=phone;
+  if(services&&$('f-notes'))$('f-notes').value=(details?services+'\n'+details:services);
+  else if(details&&$('f-notes'))$('f-notes').value=details;
   closeFSearch();
   calcTotals();
 }
