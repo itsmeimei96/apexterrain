@@ -61,7 +61,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiQHMuQAv_DXH5U27PKSOyqTxCuxMLySI&libraries=places&v=weekly&callback=initAutocomplete" async defer></script>
 
   <script>
     tailwind.config = {
@@ -980,7 +979,7 @@
             <!-- Property Address -->
             <div>
               <label class="quote-label">Property Address *</label>
-              <input id="q-address" type="text" placeholder="Start typing your address..." required class="quote-input" />
+              <input id="q-address" type="text" placeholder="e.g. 123 Main St, Mission, BC" required class="quote-input" />
             </div>
 
             <!-- Services checkboxes -->
@@ -1199,58 +1198,6 @@
       }
     }
 
-    // Google Places Autocomplete on the property address field
-    function initAutocomplete() {
-      const input = document.getElementById('q-address');
-      if (!input) return;
-
-      const autocomplete = new google.maps.places.Autocomplete(input, {
-        types: ['address'],
-        componentRestrictions: { country: 'ca' },
-        fields: ['formatted_address']
-      });
-
-      // When a suggestion is selected, fill the input with the clean formatted address
-      autocomplete.addListener('place_changed', () => {
-        const place = autocomplete.getPlace();
-        if (place.formatted_address) {
-          input.value = place.formatted_address;
-        }
-      });
-
-      // Style the Google autocomplete dropdown to match the form
-      const style = document.createElement('style');
-      style.textContent = `
-        .pac-container {
-          font-family: 'Roboto', sans-serif;
-          font-size: 0.88rem;
-          border: 1px solid #f28c28;
-          border-top: none;
-          border-radius: 0 0 4px 4px;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-          margin-top: -1px;
-        }
-        .pac-item {
-          padding: 9px 14px;
-          cursor: pointer;
-          border-top: 1px solid #f0f0f0;
-          color: #1a1a1a;
-          line-height: 1.4;
-        }
-        .pac-item:hover, .pac-item-selected {
-          background: #fff8f2;
-        }
-        .pac-item-query {
-          font-size: 0.88rem;
-          color: #1a1a1a;
-          font-weight: 500;
-        }
-        .pac-matched { color: #f28c28; font-weight: 600; }
-        .pac-icon { display: none; }
-        .pac-logo:after { display: none; }
-      `;
-      document.head.appendChild(style);
-    }
 
     // Service area card hover — image zoom + orange border
     document.querySelectorAll('.area-card').forEach(card => {
