@@ -91,7 +91,6 @@ function handleFormSubmission(ss, data) {
   // 1. Write to Form Submissions tab
   const formSheet = ss.getSheetByName(FORM_TAB);
   if (formSheet) {
-    // Add header row if sheet is empty
     if (formSheet.getLastRow() === 0) {
       formSheet.appendRow(['Timestamp', 'Invoice ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Address', 'Services', 'Details']);
     }
@@ -111,7 +110,6 @@ function handleFormSubmission(ss, data) {
   // 2. Write to Invoice_Database tab
   const invoiceSheet = ss.getSheetByName(INVOICE_TAB);
   if (invoiceSheet) {
-    // Add header row if sheet is empty
     if (invoiceSheet.getLastRow() === 0) {
       invoiceSheet.appendRow(['Invoice ID', 'Name', 'Email', 'Address', 'Status', 'Total Amount', 'Date Created', 'Phone', 'Services', 'Details']);
     }
