@@ -513,6 +513,11 @@ select.ed-field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
     </div>
     <button class="btn btn-orange btn-full" onclick="saveSettings()">Save Settings</button>
     <button class="btn btn-surface btn-full" style="margin-top:10px;" onclick="closeSettings()">Cancel</button>
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
+      <div class="sheet-sec-title" style="color:var(--red);margin-bottom:10px;">Danger Zone</div>
+      <button class="btn btn-red btn-full" onclick="resetAndImport()">🔄 Clear All Data & Re-import from Sheet</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.6;">Deletes all local invoices and re-imports fresh data from your Google Sheet. Cannot be undone.</div>
+    </div>
   </div>
 </div>
 
@@ -1642,6 +1647,30 @@ function startSync(){
     expenses.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     if(currentTab==='receipts')renderExpenses();
   },()=>{});
+}
+
+// ── Reset all local data and reimport from Google Sheet ──────────
+async function resetAndImport(){
+  if(!confirm('This will delete ALL invoices from this app and reimport fresh data from your Google Sheet.\n\nCannot be undone. Continue?')) return;
+  closeSettings();
+  toast('Clearing old data…');
+  try{
+    // Delete all invoices from Firestore
+    const snap = await invCol.get();
+    const batch = db.batch();
+    snap.docs.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+    invoices = [];
+    toast('Old data cleared. Importing from sheet…');
+    // Clear offline queue
+    localStorage.removeItem('apex-sheet-q');
+    // Reimport from sheet
+    await fetchSheetInvoices();
+    toast('✅ Import complete!');
+  } catch(e){
+    console.error('Reset failed', e);
+    toast('Something went wrong — check console', false);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
