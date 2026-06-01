@@ -61,6 +61,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiQHMuQAv_DXH5U27PKSOyqTxCuxMLySI&libraries=places&v=weekly&callback=initAutocomplete" async defer></script>
 
   <script>
     tailwind.config = {
@@ -977,10 +978,9 @@
             </div>
 
             <!-- Property Address -->
-            <div style="position: relative;">
+            <div>
               <label class="quote-label">Property Address *</label>
-              <input id="q-address" type="text" placeholder="e.g. 123 Main St, Mission, BC" required class="quote-input" autocomplete="off" />
-              <ul id="addr-suggestions" style="display:none; position:absolute; z-index:999; left:0; right:0; top:100%; margin-top:2px; background:#fff; border:1px solid #f28c28; border-top:none; list-style:none; padding:0; margin-bottom:0; box-shadow:0 8px 24px rgba(0,0,0,0.12); max-height:220px; overflow-y:auto;"></ul>
+              <input id="q-address" type="text" placeholder="Start typing your address..." required class="quote-input" autocomplete="off" />
             </div>
 
             <!-- Services checkboxes -->
@@ -1231,78 +1231,37 @@
       observer.observe(el);
     });
 
-    // Address autocomplete via OpenStreetMap Nominatim (free, no API key)
-    (function() {
+    // Google Places Autocomplete on the property address field
+    function initAutocomplete() {
       const input = document.getElementById('q-address');
-      const list  = document.getElementById('addr-suggestions');
-      if (!input || !list) return;
-
-      let timer, activeIdx = -1;
-
-      const liStyle = 'padding:9px 14px;cursor:pointer;border-top:1px solid #f0f0f0;font-family:Roboto,sans-serif;font-size:0.86rem;color:#1a1a1a;line-height:1.4;';
-
-      function showList(items) {
-        list.innerHTML = '';
-        activeIdx = -1;
-        if (!items.length) { list.style.display = 'none'; return; }
-        items.forEach(function(item) {
-          const li = document.createElement('li');
-          li.style.cssText = liStyle;
-          li.textContent = item.display_name;
-          li.addEventListener('mouseenter', function(){ this.style.background = '#fff8f2'; });
-          li.addEventListener('mouseleave', function(){ this.style.background = '#fff'; });
-          li.addEventListener('mousedown', function(e) {
-            e.preventDefault();
-            input.value = item.display_name;
-            list.style.display = 'none';
-          });
-          list.appendChild(li);
-        });
-        list.style.display = 'block';
-      }
-
-      function search(q) {
-        if (q.length < 4) { list.style.display = 'none'; return; }
-        fetch('https://nominatim.openstreetmap.org/search?format=json&countrycodes=ca&addressdetails=0&limit=5&q=' + encodeURIComponent(q), {
-          headers: { 'Accept-Language': 'en', 'User-Agent': 'ApexTerrainWebsite/1.0' }
-        })
-        .then(function(r){ return r.json(); })
-        .then(showList)
-        .catch(function(){ list.style.display = 'none'; });
-      }
-
-      input.addEventListener('input', function() {
-        clearTimeout(timer);
-        timer = setTimeout(function(){ search(input.value.trim()); }, 350);
+      if (!input || !window.google) return;
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['address'],
+        componentRestrictions: { country: 'ca' },
+        fields: ['formatted_address']
       });
-
-      // Keyboard navigation
-      input.addEventListener('keydown', function(e) {
-        const items = list.querySelectorAll('li');
-        if (!items.length || list.style.display === 'none') return;
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          activeIdx = Math.min(activeIdx + 1, items.length - 1);
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          activeIdx = Math.max(activeIdx - 1, 0);
-        } else if (e.key === 'Enter' && activeIdx >= 0) {
-          e.preventDefault();
-          input.value = items[activeIdx].textContent;
-          list.style.display = 'none';
-          return;
-        } else if (e.key === 'Escape') {
-          list.style.display = 'none'; return;
-        }
-        items.forEach(function(li, i) {
-          li.style.background = i === activeIdx ? '#fff8f2' : '#fff';
-        });
+      autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
+        if (place.formatted_address) input.value = place.formatted_address;
       });
-
-      document.addEventListener('click', function(e) {
-        if (!input.contains(e.target) && !list.contains(e.target)) list.style.display = 'none';
-      });
-    })();
+      // Style the dropdown to match the site
+      const style = document.createElement('style');
+      style.textContent = `
+        .pac-container { font-family:'Roboto',sans-serif; font-size:0.88rem; border:1px solid #f28c28; border-top:none; border-radius:0 0 4px 4px; box-shadow:0 8px 24px rgba(0,0,0,0.15); margin-top:-1px; }
+        .pac-item { padding:9px 14px; cursor:pointer; border-top:1px solid #f0f0f0; color:#1a1a1a; line-height:1.4; }
+        .pac-item:hover,.pac-item-selected { background:#fff8f2; }
+        .pac-item-query { font-size:0.88rem; color:#1a1a1a; font-weight:500; }
+        .pac-matched { color:#f28c28; font-weight:600; }
+        .pac-icon,.pac-logo:after { display:none; }
+      `;
+      document.head.appendChild(style);
+    }
+    // Init once Maps SDK is ready
+    if (window.google && window.google.maps) {
+      initAutocomplete();
+    } else {
+      window.initAutocomplete = initAutocomplete;
+    }
   </script>
 </body>
 </html>
