@@ -12,9 +12,6 @@
   <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/itsmeimei96/apexterrain/main/brand_assets/Logo.jpeg">
   <title>APEX Operations</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -580,22 +577,18 @@ select.ed-field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 // ═══════════════════════════════════════════════════════════════
 //  FIREBASE
 // ═══════════════════════════════════════════════════════════════
-const FB_CFG = {
-  apiKey:"AIzaSyCew7H3p0WR_JxbMEaCUyTh3e3LFyP27Hk",
-  authDomain:"apex-invoice-8c872.firebaseapp.com",
-  projectId:"apex-invoice-8c872",
-  storageBucket:"apex-invoice-8c872.firebasestorage.app",
-  messagingSenderId:"340911188880",
-  appId:"1:340911188880:web:f57772010c891846982115"
-};
-firebase.initializeApp(FB_CFG);
-const auth   = firebase.auth();
-const db     = firebase.firestore();
-const invCol = db.collection('invoices');
-const expCol = db.collection('expenses');
-db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
-// Sign in anonymously so Firestore rules can require auth
-auth.signInAnonymously().catch(()=>{});
+// ── localStorage data layer ──────────────────────────────────────
+function lsGetInvoices(){try{return JSON.parse(localStorage.getItem('apex-invoices')||'[]');}catch{return[];}}
+function lsGetExpenses(){try{return JSON.parse(localStorage.getItem('apex-expenses')||'[]');}catch{return[];}}
+function lsSaveInvoices(arr){localStorage.setItem('apex-invoices',JSON.stringify(arr));}
+function lsSaveExpenses(arr){localStorage.setItem('apex-expenses',JSON.stringify(arr));}
+function lsUpsertInvoice(inv){const arr=lsGetInvoices();const i=arr.findIndex(x=>x.id===inv.id);if(i>=0)arr[i]=inv;else arr.push(inv);lsSaveInvoices(arr);refreshInvoices();}
+function lsUpsertExpense(exp){const arr=lsGetExpenses();const i=arr.findIndex(x=>x.id===exp.id);if(i>=0)arr[i]=exp;else arr.push(exp);lsSaveExpenses(arr);refreshExpenses();}
+function lsDeleteInvoice(id){lsSaveInvoices(lsGetInvoices().filter(x=>x.id!==id));refreshInvoices();}
+function lsDeleteExpense(id){lsSaveExpenses(lsGetExpenses().filter(x=>x.id!==id));refreshExpenses();}
+function lsMergeInvoice(id,updates){const arr=lsGetInvoices();const i=arr.findIndex(x=>x.id===id);if(i>=0){arr[i]=Object.assign({},arr[i],updates);lsSaveInvoices(arr);}refreshInvoices();}
+function refreshInvoices(){invoices=lsGetInvoices().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));renderInvoiceList(invoices);renderHome();if(currentTab==='reports')renderReports();}
+function refreshExpenses(){expenses=lsGetExpenses().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));if(currentTab==='receipts')renderExpenses();}
 
 // ═══════════════════════════════════════════════════════════════
 //  CONSTANTS
@@ -847,12 +840,10 @@ async function qaAction(actionId){
   }
   $('qa-bg').classList.remove('open');
   const idForSync=qaInvId;
-  try{
-    await invCol.doc(idForSync).set(updates,{merge:true});
-    const inv=invoices.find(i=>i.id===idForSync);
-    if(inv) syncToSheet(Object.assign({},inv,updates));
-    toast('Updated!');
-  }catch(e){toast('Update failed: '+e.code,false);console.error(e);}
+  lsMergeInvoice(idForSync, updates);
+  const inv=invoices.find(i=>i.id===idForSync);
+  if(inv) syncToSheet(Object.assign({},inv,updates));
+  toast('Updated!');
   qaInvId=null;
 }
 
@@ -1052,12 +1043,10 @@ function buildInvObj(){
 async function saveInvoice(){
   const inv=buildInvObj();
   if(!editingId)editingId=inv.id;
-  try{
-    await invCol.doc(inv.id).set(inv);
-    syncToSheet(inv);
-    toast('Invoice saved!');
-    closeEditor();
-  }catch(e){toast('Save failed: '+e.code,false);console.error(e);}
+  lsUpsertInvoice(inv);
+  syncToSheet(inv);
+  toast('Invoice saved!');
+  closeEditor();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1350,12 +1339,9 @@ async function saveReceipt(){
     category:$('r-cat').value,notes:$('r-notes').value.trim(),
     createdAt:Date.now()
   };
-  try{
-    await expCol.doc(exp.id).set(exp);
-    $('r-form').style.display='none';
-    toast('Expense saved!');
-    renderExpenses();
-  }catch(e){toast('Save failed',false);}
+  lsUpsertExpense(exp);
+  $('r-form').style.display='none';
+  toast('Expense saved!');
 }
 
 function renderExpenses(){
@@ -1412,11 +1398,9 @@ async function confirmYes(){
   const id=pendingDelId,type=pendingDelType;
   pendingDelId=null;
   $('confirm-bg').style.display='none';
-  try{
-    if(type==='invoice')await invCol.doc(id).delete();
-    else await expCol.doc(id).delete();
-    toast('Deleted.');
-  }catch(e){toast('Delete failed: '+e.code,false);console.error(e);}
+  if(type==='invoice') lsDeleteInvoice(id);
+  else lsDeleteExpense(id);
+  toast('Deleted.');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1520,7 +1504,7 @@ async function fetchSheetInvoices(){
           total:Number(row.total)||0,
           createdAt:now,updatedAt:now
         };
-        invCol.doc(row.id).set(newInv).catch(()=>{});
+        lsUpsertInvoice(newInv);
         imported++;
       } else {
         // Row already in Firebase — reconcile status if sheet differs
@@ -1528,7 +1512,7 @@ async function fetchSheetInvoices(){
         const sheetLabel=String(row.status||'').trim();
         if(sheetLabel && sheetLabel!==currentLabel){
           const fields=statusLabelToFields(sheetLabel);
-          invCol.doc(row.id).update({...fields,updatedAt:Date.now()}).catch(()=>{});
+          lsMergeInvoice(row.id, {...fields, updatedAt:Date.now()});
         }
       }
     }
@@ -1617,40 +1601,15 @@ function fillFromForm(idx){
 
 window.addEventListener('online', ()=>{flushSheetQueue();fetchSheetInvoices();});
 
-// ═══════════════════════════════════════════════════════════════
-//  FIRESTORE REAL-TIME SYNC
-// ═══════════════════════════════════════════════════════════════
-async function purgeEmptyInvoices(){
-  try{
-    const snap=await invCol.get();
-    const toDelete=snap.docs.filter(doc=>{
-      const c=doc.data().customer||{};
-      return !c.name&&!c.email&&!c.street;
-    });
-    if(!toDelete.length)return;
-    const batch=db.batch();
-    toDelete.forEach(doc=>batch.delete(doc.ref));
-    await batch.commit();
-    toast(`Removed ${toDelete.length} empty invoice${toDelete.length!==1?'s':''}`);
-  }catch(e){console.error('Purge failed',e);}
+// ── Load from localStorage on startup ───────────────────────────
+function purgeEmptyInvoices(){
+  const arr=lsGetInvoices().filter(inv=>{const c=inv.customer||{};return c.name||c.email||c.street;});
+  lsSaveInvoices(arr);
 }
 
 function startSync(){
-  // Invoices
-  invCol.onSnapshot(snap=>{
-    invoices=snap.docs.map(d=>d.data());
-    invoices.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-    renderInvoiceList(invoices);
-    renderHome();
-    if(currentTab==='reports')renderReports();
-  },()=>toast('Sync error',false));
-
-  // Expenses
-  expCol.onSnapshot(snap=>{
-    expenses=snap.docs.map(d=>d.data());
-    expenses.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-    if(currentTab==='receipts')renderExpenses();
-  },()=>{});
+  refreshInvoices();
+  refreshExpenses();
 }
 
 // ── Reset all local data and reimport from Google Sheet ──────────
@@ -1658,22 +1617,17 @@ async function resetAndImport(){
   if(!confirm('This will delete ALL invoices from this app and reimport fresh data from your Google Sheet.\n\nCannot be undone. Continue?')) return;
   closeSettings();
   toast('Clearing old data…');
+  localStorage.removeItem('apex-invoices');
+  localStorage.removeItem('apex-sheet-q');
+  invoices=[];
+  refreshInvoices();
+  toast('Old data cleared. Importing from sheet…');
   try{
-    // Delete all invoices from Firestore
-    const snap = await invCol.get();
-    const batch = db.batch();
-    snap.docs.forEach(doc => batch.delete(doc.ref));
-    await batch.commit();
-    invoices = [];
-    toast('Old data cleared. Importing from sheet…');
-    // Clear offline queue
-    localStorage.removeItem('apex-sheet-q');
-    // Reimport from sheet
     await fetchSheetInvoices();
     toast('✅ Import complete!');
-  } catch(e){
-    console.error('Reset failed', e);
-    toast('Something went wrong — check console', false);
+  }catch(e){
+    console.error('Reset failed',e);
+    toast('Something went wrong — check console',false);
   }
 }
 
@@ -1683,22 +1637,10 @@ async function resetAndImport(){
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 loadSettings();
 switchTab('home');
+purgeEmptyInvoices();
+startSync();
+flushSheetQueue();
 updateSyncDot();
-
-// Wait for auth before starting Firestore operations
-auth.onAuthStateChanged(user => {
-  if(user){
-    startSync();
-    purgeEmptyInvoices();
-    flushSheetQueue();
-  } else {
-    // Not signed in yet — sign in anonymously
-    auth.signInAnonymously().catch(err => {
-      console.error('Auth failed:', err);
-      toast('Sign-in failed — check Firebase Auth settings', false);
-    });
-  }
-});
 </script>
 </body>
 </html>
