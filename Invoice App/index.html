@@ -1683,10 +1683,22 @@ async function resetAndImport(){
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 loadSettings();
 switchTab('home');
-startSync();
-purgeEmptyInvoices();
-flushSheetQueue();
 updateSyncDot();
+
+// Wait for auth before starting Firestore operations
+auth.onAuthStateChanged(user => {
+  if(user){
+    startSync();
+    purgeEmptyInvoices();
+    flushSheetQueue();
+  } else {
+    // Not signed in yet — sign in anonymously
+    auth.signInAnonymously().catch(err => {
+      console.error('Auth failed:', err);
+      toast('Sign-in failed — check Firebase Auth settings', false);
+    });
+  }
+});
 </script>
 </body>
 </html>
