@@ -148,11 +148,11 @@ function handleFormSubmission(ss, data) {
                 <p style="margin:4px 0;color:#333;font-size:14px;"><strong>Address:</strong> ${data.address || 'Not provided'}</p>
                 <p style="margin:4px 0;color:#333;font-size:14px;"><strong>Services:</strong> ${data.services || 'Not specified'}</p>
               </div>
-              <p style="color:#444;line-height:1.7;margin:0 0 32px;">In the meantime, if you have any urgent questions, please feel free to call us directly at <strong>403-418-5959</strong>. Our team is available 7 days a week from 7:00 AM to 7:00 PM.</p>
+              <p style="color:#444;line-height:1.7;margin:0 0 32px;">In the meantime, if you have any urgent questions, please feel free to call us directly at <strong>236-662-8066</strong>. Our team is available 7 days a week from 7:00 AM to 7:00 PM.</p>
               <p style="color:#444;margin:0;">Best regards,<br><strong>Apex Terrain Management LTD.</strong></p>
             </div>
             <div style="background:#f5f5f5;padding:20px 40px;text-align:center;border-top:1px solid #eee;">
-              <p style="color:#999;font-size:12px;margin:0;">Mission, BC &nbsp;·&nbsp; 403-418-5959 &nbsp;·&nbsp; apexterrain.ca</p>
+              <p style="color:#999;font-size:12px;margin:0;">Mission, BC &nbsp;·&nbsp; 236-662-8066 &nbsp;·&nbsp; apexterrain.ca</p>
             </div>
           </div>
         `
