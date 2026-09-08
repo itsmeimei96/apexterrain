@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mulching & Land Clearing Mission BC | Apex Terrain Management</title>
-  <meta name="description" content="Apex Terrain Management offers professional mulching, land clearing, brush removal, and fire protection in Mission BC, Fraser Valley, and surrounding areas. Free estimates. Call 236-662-8066." />
-  <meta name="keywords" content="mulching Mission BC, land clearing Mission BC, brush removal Mission BC, vegetation management Fraser Valley, fire protection BC, tight access mulching, stump removal Mission, land clearing Abbotsford, mulching Chilliwack, bush clearing BC, forestry mulching British Columbia" />
+  <title>Mulching &amp; Land Clearing Mission BC &amp; Southern BC | Apex Terrain</title>
+  <meta name="description" content="Apex Terrain Management provides professional mulching, land clearing, brush removal, and fire protection from Mission across Southern BC, including Merritt, Kelowna, Kamloops, and Cranbrook. Free estimates: 236-662-8066." />
+  <meta name="keywords" content="mulching Mission BC, land clearing Mission BC, mulching Merritt, land clearing Kelowna, mulching Kamloops, land clearing Cranbrook, Southern BC vegetation management, brush removal BC, fire protection BC, tight access mulching, forestry mulching British Columbia" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://apexterrain.ca/" />
 
   <!-- Open Graph / Social preview -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://apexterrain.ca/" />
-  <meta property="og:title" content="Mulching & Land Clearing Mission BC | Apex Terrain Management" />
-  <meta property="og:description" content="Professional mulching, land clearing, brush removal, and fire protection serving Mission BC, Fraser Valley, and beyond. Tight access specialists. Free estimates." />
+  <meta property="og:title" content="Mulching &amp; Land Clearing Mission BC &amp; Southern BC | Apex Terrain" />
+  <meta property="og:description" content="Professional mulching, land clearing, brush removal, and fire protection serving Mission, Merritt, Kelowna, Kamloops, Cranbrook, and Southern BC." />
   <meta property="og:image" content="https://raw.githubusercontent.com/itsmeimei96/apexterrain/main/brand_assets/Logo.jpeg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Mulching & Land Clearing Mission BC | Apex Terrain Management" />
-  <meta name="twitter:description" content="Professional mulching, land clearing, brush removal, and fire protection serving Mission BC and Fraser Valley." />
+  <meta name="twitter:title" content="Mulching &amp; Land Clearing Mission BC &amp; Southern BC | Apex Terrain" />
+  <meta name="twitter:description" content="Professional mulching, land clearing, brush removal, and fire protection serving Mission, Merritt, Kelowna, Kamloops, Cranbrook, and Southern BC." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/itsmeimei96/apexterrain/main/brand_assets/Logo.jpeg" />
 
   <!-- Local Business structured data -->
@@ -44,13 +44,14 @@
     "areaServed": [
       "Mission BC", "Abbotsford BC", "Chilliwack BC", "Maple Ridge BC",
       "Coquitlam BC", "Port Coquitlam BC", "Langley BC", "Hope BC",
-      "Fraser Valley BC", "British Columbia"
+      "Merritt BC", "Kelowna BC", "Kamloops BC", "Cranbrook BC",
+      "Fraser Valley BC", "Southern British Columbia", "British Columbia"
     ],
     "serviceType": [
       "Mulching", "Land Clearing", "Brush Removal", "Vegetation Management",
       "Fire Protection", "Storm Clean-Up", "Tight Access Mulching", "Stump Removal"
     ],
-    "description": "Apex Terrain Management provides professional mulching, land clearing, brush and bush removal, fire protection, and storm clean-up across Mission BC, Fraser Valley, and surrounding areas.",
+    "description": "Apex Terrain Management provides professional mulching, land clearing, brush and bush removal, fire protection, and storm clean-up from Mission throughout Southern British Columbia, including Merritt, Kelowna, Kamloops, Cranbrook, and the Fraser Valley.",
     "priceRange": "$$",
     "openingHours": "Mo-Sa 07:00-18:00"
   }
@@ -152,6 +153,9 @@
     .nav-link:hover { color: #fff; }
     .nav-link:hover::after { width: 100%; }
     .nav-link:focus-visible { outline: 2px solid #f28c28; outline-offset: 3px; }
+    .social-nav-link { display: inline-flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.7); transition: color 0.2s ease, transform 0.15s ease; }
+    .social-nav-link:hover { color: #f28c28; transform: translateY(-2px); }
+    .social-nav-link:focus-visible { outline: 2px solid #f28c28; outline-offset: 3px; }
 
     /* Service cards */
     .service-card {
@@ -244,6 +248,57 @@
     /* Hero gallery card */
     .hero-img-card { aspect-ratio: 16/9; }
     @media(min-width:1024px){ .hero-img-card { aspect-ratio: 4/3; } }
+    .work-media { position: relative; overflow: hidden; background: #222; }
+    .work-media img { display: block; width: 100%; height: auto; object-fit: contain; transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94); }
+    .work-media video { display: block; width: 100%; height: auto; object-fit: contain; background: #0b0b0b; }
+    .work-media:hover img { transform: scale(1.04); }
+    .action-gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; align-items: start; grid-auto-flow: dense; }
+    .action-gallery .work-media { min-width: 0; }
+    .action-gallery .action-feature { grid-column: span 2; }
+    .action-gallery .action-feature { aspect-ratio: 16 / 10; }
+    .action-gallery .action-feature video { width: 100%; height: 100%; object-fit: cover; }
+    .action-gallery > .work-media:not(.action-feature) { aspect-ratio: 16 / 10; }
+    .action-gallery > .work-media:not(.action-feature) img { width: 100%; height: 100%; object-fit: cover; }
+    .action-gallery > .work-media:not(.action-feature) video { width: 100%; height: 100%; object-fit: cover; }
+    .action-gallery > .work-media.action-portrait { aspect-ratio: auto; }
+    .action-gallery > .work-media.action-portrait img { width: 100%; height: auto; object-fit: contain; }
+    @media(max-width: 1023px){ .action-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } .action-gallery .action-feature { grid-column: span 2; } }
+    @media(max-width: 639px){ .action-gallery { grid-template-columns: 1fr; } .action-gallery .action-feature { grid-column: span 1; } }
+    .action-media-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
+    .action-media-layout > div { display: flex; flex-direction: column; }
+    .action-video-grid { display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 40px; height: 100%; min-height: 100%; flex: 1; }
+    .action-photo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 20px; }
+    .action-video-grid .work-media, .action-photo-grid .work-media { min-height: 0; }
+    .action-video-grid video, .action-photo-grid img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .action-video-grid iframe { display: block; width: 100%; height: 100%; border: 0; }
+    .action-video-grid .video-placeholder { position: relative; aspect-ratio: 16 / 10; }
+    .action-video-grid .video-placeholder img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .action-photo-grid .work-media { cursor: zoom-in; }
+    .action-photo-grid .work-media:focus-visible { outline: 2px solid #f28c28; outline-offset: 3px; }
+    .lightbox-nav { position: absolute; top: 50%; z-index: 10; display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; transform: translateY(-50%); border: 1px solid rgba(255,255,255,0.35); background: rgba(0,0,0,0.45); color: #fff; font-size: 1.5rem; cursor: pointer; transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
+    .lightbox-nav:hover { color: #1a1a1a; border-color: #f28c28; background: #f28c28; }
+    .lightbox-nav:focus-visible { outline: 2px solid #f28c28; outline-offset: 3px; }
+    #lightbox-prev { left: 20px; }
+    #lightbox-next { right: 20px; }
+    @media(max-width: 1023px){ .action-media-layout { grid-template-columns: 1fr; } .action-video-grid { height: auto; min-height: 0; } .action-video-grid .work-media { aspect-ratio: 16 / 10; } }
+    @media(max-width: 639px){ .action-photo-grid { grid-template-columns: 1fr; grid-template-rows: none; } .action-video-grid { grid-template-rows: none; } .action-video-grid .work-media, .action-photo-grid .work-media { aspect-ratio: 16 / 10; } }
+    .work-badge { position: absolute; top: 16px; left: 16px; z-index: 2; padding: 7px 11px; background: #f28c28; color: #1a1a1a; font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+    .video-frame { position: relative; width: min(100%, 360px); aspect-ratio: 9/16; margin: 0 auto; overflow: hidden; background: #0b0b0b; border: 1px solid rgba(242,140,40,0.28); box-shadow: 0 18px 60px rgba(0,0,0,0.4), 0 0 50px rgba(242,140,40,0.08); }
+    .video-frame video { width: 100%; height: 100%; object-fit: cover; }
+    .video-frame::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(242,140,40,0.12), transparent 48%, rgba(0,0,0,0.45)); pointer-events: none; }
+    .review-card { background: #f7f7f5; color: #1a1a1a; padding: 28px; border-left: 4px solid #f28c28; box-shadow: 0 12px 34px rgba(0,0,0,0.22); }
+    .review-stars { color: #f28c28; letter-spacing: 0.12em; font-size: 0.95rem; }
+    .work-carousel { position: relative; overflow: hidden; }
+    .work-track { display: flex; gap: 20px; transition: transform 0.55s cubic-bezier(0.22,0.61,0.36,1); }
+    .work-slide { flex: 0 0 calc((100% - 20px) / 2); min-width: 0; }
+    .carousel-control { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.04); color: #fff; cursor: pointer; transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.15s ease; }
+    .carousel-control:hover { color: #1a1a1a; border-color: #f28c28; background: #f28c28; transform: translateY(-2px); }
+    .carousel-control:active { transform: translateY(0); }
+    .carousel-control:focus-visible { outline: 2px solid #f28c28; outline-offset: 3px; }
+    .carousel-dot { width: 7px; height: 7px; border: 0; padding: 0; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: background 0.2s ease, transform 0.2s ease; }
+    .carousel-dot.active { background: #f28c28; transform: scale(1.35); }
+    @media(max-width: 767px){ .work-slide { flex-basis: 100%; } }
+    @media(min-width: 768px) and (max-width: 1023px){ .work-slide { flex-basis: calc((100% - 20px) / 2); } }
   </style>
 </head>
 <body class="topo-bg">
@@ -258,9 +313,17 @@
       <!-- Desktop nav -->
       <div class="hidden lg:flex items-center gap-8">
         <a href="#services" class="nav-link">Services</a>
+        <a href="#work" class="nav-link">Our Work</a>
+        <a href="#action" class="nav-link">Work in Progress</a>
         <a href="#service-areas" class="nav-link">Areas</a>
         <a href="#about" class="nav-link">About</a>
         <a href="#process" class="nav-link">Our Process</a>
+        <a href="https://www.instagram.com/apexterrain.ca/" target="_blank" rel="noopener" class="social-nav-link" aria-label="Follow Apex Terrain on Instagram" title="Instagram">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.7" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.facebook.com/apexterrain.ca/" target="_blank" rel="noopener" class="social-nav-link" aria-label="Follow Apex Terrain on Facebook" title="Facebook">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8h3V4h-3c-3.3 0-5 1.7-5 5v3H6v4h3v8h4v-8h3.5l.5-4H13V9c0-.7.3-1 1-1z"/></svg>
+        </a>
         <a href="#contact" class="btn-primary text-sm" style="padding: 10px 24px;">Free Quote</a>
       </div>
 
@@ -279,8 +342,19 @@
     <div id="mobile-menu" class="hidden lg:hidden mt-4 pb-4 border-t border-white/10">
       <div class="flex flex-col gap-4 pt-4 px-2">
         <a href="#services" class="nav-link" onclick="closeMobileMenu()">Services</a>
+        <a href="#work" class="nav-link" onclick="closeMobileMenu()">Our Work</a>
+        <a href="#action" class="nav-link" onclick="closeMobileMenu()">Work in Progress</a>
         <a href="#about" class="nav-link" onclick="closeMobileMenu()">About</a>
         <a href="#process" class="nav-link" onclick="closeMobileMenu()">Our Process</a>
+        <a href="tel:+12366628066" class="nav-link" onclick="closeMobileMenu()">Call 236-662-8066</a>
+        <div class="flex items-center gap-4 pt-1">
+          <a href="https://www.instagram.com/apexterrain.ca/" target="_blank" rel="noopener" class="social-nav-link" aria-label="Follow Apex Terrain on Instagram" title="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.7" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="https://www.facebook.com/apexterrain.ca/" target="_blank" rel="noopener" class="social-nav-link" aria-label="Follow Apex Terrain on Facebook" title="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8h3V4h-3c-3.3 0-5 1.7-5 5v3H6v4h3v8h4v-8h3.5l.5-4H13V9c0-.7.3-1 1-1z"/></svg>
+          </a>
+        </div>
         <a href="#contact" class="btn-primary self-start mt-2" onclick="closeMobileMenu()">Free Quote</a>
       </div>
     </div>
@@ -298,23 +372,31 @@
     <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-24 grid lg:grid-cols-2 gap-12 items-center">
       <!-- Left: copy -->
       <div>
-        <p class="section-label mb-6">Mission BC's Mulching & Land Clearing Specialists</p>
+        <p class="section-label mb-6">Mission BC &amp; Southern BC's Mulching Specialists</p>
         <h1 class="font-heading text-white mb-6" style="font-size: clamp(3.2rem, 7vw, 6rem); line-height: 0.95;">
           Where Tough<br /><span style="color: #f28c28;">Terrain</span><br />Meets Expert<br />Hands
         </h1>
         <p class="text-white/60 mb-10 max-w-lg" style="font-size: 1.05rem; line-height: 1.75; font-weight: 300;">
-          Apex Terrain Management LTD. delivers precision mulching, land clearing, brush and bush removal, fire protection, and storm clean-up across Mission BC, Fraser Valley, and beyond — tackling the sites other contractors won't touch.
+          Apex Terrain Management LTD. delivers precision mulching, land clearing, brush and bush removal, fire protection, and storm clean-up from Mission throughout Southern BC — including Merritt, Kelowna, Kamloops, Cranbrook, the Fraser Valley, and beyond.
         </p>
         <div class="flex flex-wrap gap-4">
           <a href="#contact" class="btn-primary">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             Get a Free Quote
           </a>
-          <a href="#services" class="btn-outline">View Services</a>
+          <a href="tel:+12366628066" class="btn-outline" aria-label="Call Apex Terrain at 236-662-8066">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.63a2 2 0 0 1-.45 2.11L8 9.73a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.73.5 2.63.62A2 2 0 0 1 22 16.92z"/></svg>
+            236-662-8066
+          </a>
         </div>
 
         <!-- Trust badges -->
         <div class="mt-12 flex flex-wrap gap-6 items-center">
+          <div class="flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#f28c28"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span style="font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-family: 'Barlow Condensed', sans-serif; font-weight: 600;">WorkSafe BC Registered</span>
+          </div>
+          <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1);"></div>
           <div class="flex items-center gap-2">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#f28c28"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span style="font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-family: 'Barlow Condensed', sans-serif; font-weight: 600;">Fully Insured</span>
@@ -322,62 +404,125 @@
           <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1);"></div>
           <div class="flex items-center gap-2">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#f28c28"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span style="font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-family: 'Barlow Condensed', sans-serif; font-weight: 600;">Licensed & Certified</span>
-          </div>
-          <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1);"></div>
-          <div class="flex items-center gap-2">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#f28c28"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span style="font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-family: 'Barlow Condensed', sans-serif; font-weight: 600;">Free Estimates</span>
+            <span style="font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-family: 'Barlow Condensed', sans-serif; font-weight: 600;">Licensed</span>
           </div>
         </div>
       </div>
 
-      <!-- Right: hero image card -->
+      <!-- Right: hero video -->
       <div class="relative">
-        <div class="hero-img-card relative rounded-sm overflow-hidden orange-glow" style="border: 1px solid rgba(242,140,40,0.2);">
-          <!-- Slideshow images -->
-          <img id="hero-slide-0" src="brand_assets/Gallery 1.jpg" alt="Apex Terrain project" class="w-full h-full object-cover absolute inset-0" style="opacity: 1; transition: opacity 0.9s ease;" />
-          <img id="hero-slide-1" src="brand_assets/Gallery 2.jpg" alt="Apex Terrain project" class="w-full h-full object-cover absolute inset-0" style="opacity: 0; transition: opacity 0.9s ease;" />
-          <img id="hero-slide-2" src="brand_assets/Gallery 3.jpg" alt="Apex Terrain project" class="w-full h-full object-cover absolute inset-0" style="opacity: 0; transition: opacity 0.9s ease;" />
+        <div class="video-frame rounded-sm">
+          <video autoplay muted loop playsinline preload="metadata" poster="brand_assets/Gallery 1.jpg" aria-label="Apex Terrain working on steep terrain">
+            <source src="brand_assets/Steep Terrain.mp4" type="video/mp4" />
+          </video>
           <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(26,26,26,0.8) 0%, rgba(26,26,26,0.1) 60%, transparent 100%); z-index: 1;"></div>
-          <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(242,140,40,0.15) 0%, transparent 50%); mix-blend-mode: multiply; z-index: 2;"></div>
           <!-- Bottom label -->
           <div class="absolute bottom-0 left-0 right-0 p-6" style="z-index: 3;">
-            <p class="font-heading-md text-white" style="font-size: 1.4rem;">Tight Access Specialists</p>
-            <p class="text-white/50 text-sm mt-1" style="font-weight: 300;">Where others can't go — we deliver</p>
-          </div>
-          <!-- Dot indicators -->
-          <div class="absolute bottom-4 right-6 flex gap-2" style="z-index: 3;">
-            <span class="hero-dot" data-idx="0" style="width:7px;height:7px;border-radius:50%;background:#f28c28;display:inline-block;cursor:pointer;transition:opacity 0.3s ease;opacity:1;"></span>
-            <span class="hero-dot" data-idx="1" style="width:7px;height:7px;border-radius:50%;background:#f28c28;display:inline-block;cursor:pointer;transition:opacity 0.3s ease;opacity:0.35;"></span>
-            <span class="hero-dot" data-idx="2" style="width:7px;height:7px;border-radius:50%;background:#f28c28;display:inline-block;cursor:pointer;transition:opacity 0.3s ease;opacity:0.35;"></span>
+            <p class="font-heading-md text-white" style="font-size: 1.4rem;">Steep Terrain in Action</p>
+            <p class="text-white/60 text-sm mt-1" style="font-weight: 300;">Real equipment. Real terrain. Real results.</p>
           </div>
           <!-- Corner accent -->
           <div class="absolute top-0 left-0 w-12 h-12" style="background: linear-gradient(135deg, rgba(242,140,40,0.6) 0%, transparent 60%); z-index: 3;"></div>
         </div>
       </div>
-      <script>
-        (function(){
-          var total = 3, cur = 0;
-          function goTo(n) {
-            document.getElementById('hero-slide-' + cur).style.opacity = '0';
-            document.querySelectorAll('.hero-dot')[cur].style.opacity = '0.35';
-            cur = n % total;
-            document.getElementById('hero-slide-' + cur).style.opacity = '1';
-            document.querySelectorAll('.hero-dot')[cur].style.opacity = '1';
-          }
-          document.querySelectorAll('.hero-dot').forEach(function(dot) {
-            dot.addEventListener('click', function(){ goTo(parseInt(this.dataset.idx)); });
-          });
-          setInterval(function(){ goTo(cur + 1); }, 4000);
-        })();
-      </script>
     </div>
 
     <!-- Scroll indicator -->
     <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
       <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.6);">Scroll</span>
       <div style="width: 1px; height: 40px; background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ OUR WORK ═══════════════ -->
+  <section id="work" class="py-28 px-6 lg:px-12 relative overflow-hidden" style="background: #0f0f0f;">
+    <div class="absolute inset-0 topo-lines opacity-25 pointer-events-none"></div>
+    <div class="relative z-10 max-w-7xl mx-auto">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-14">
+        <div>
+          <p class="section-label mb-4">Project Results</p>
+          <h2 class="font-heading text-white" style="font-size: clamp(2.5rem, 5vw, 4rem); line-height: 0.95;">BEFORE &amp;<br /><span style="color: #f28c28;">AFTER</span></h2>
+        </div>
+        <p class="text-white/50 max-w-md" style="line-height: 1.75; font-weight: 300;">See the difference our team creates, from overgrown and difficult ground to a cleaner, more usable site.</p>
+      </div>
+
+      <div class="work-carousel" aria-roledescription="carousel" aria-label="Before and after project photos">
+        <div class="work-track" id="work-track">
+          <article class="work-slide" aria-label="Before and after project 1 of 6">
+            <div class="work-media"><img src="brand_assets/Before after 1.jpg" alt="Before and after tree clearing project" loading="lazy" /></div>
+            <div class="pt-4"><p class="section-label">Before &amp; after · 01</p><h3 class="font-heading text-white mt-1" style="font-size: 1.25rem;">Tree clearing</h3></div>
+          </article>
+          <article class="work-slide" aria-label="Before and after project 2 of 6">
+            <div class="work-media"><img src="brand_assets/Before after 2.jpg" alt="Before and after field clearing project" loading="lazy" /></div>
+            <div class="pt-4"><p class="section-label">Before &amp; after · 02</p><h3 class="font-heading text-white mt-1" style="font-size: 1.25rem;">Field clearing</h3></div>
+          </article>
+          <article class="work-slide" aria-label="Before and after project 3 of 6">
+            <div class="work-media"><img src="brand_assets/Before after 3.jpg" alt="Before and after vegetation removal project" loading="lazy" /></div>
+            <div class="pt-4"><p class="section-label">Before &amp; after · 03</p><h3 class="font-heading text-white mt-1" style="font-size: 1.25rem;">Vegetation removal</h3></div>
+          </article>
+          <article class="work-slide" aria-label="Before and after project 4 of 6">
+            <div class="work-media"><img src="brand_assets/Before after 4.jpg" alt="Before and after tree maintenance project" loading="lazy" /></div>
+            <div class="pt-4"><p class="section-label">Before &amp; after · 04</p><h3 class="font-heading text-white mt-1" style="font-size: 1.25rem;">Tree maintenance</h3></div>
+          </article>
+          <article class="work-slide" aria-label="Before and after project 5 of 6">
+            <div class="work-media"><img src="brand_assets/Before after 5.jpg" alt="Before and after brush clearing project" loading="lazy" /></div>
+            <div class="pt-4"><p class="section-label">Before &amp; after · 05</p><h3 class="font-heading text-white mt-1" style="font-size: 1.25rem;">Brush clearing</h3></div>
+          </article>
+          <article class="work-slide" aria-label="Before and after project 6 of 6">
+            <div class="work-media"><img src="brand_assets/Before after 6.jpg" alt="Before and after site preparation project" loading="lazy" /></div>
+            <div class="pt-4"><p class="section-label">Before &amp; after · 06</p><h3 class="font-heading text-white mt-1" style="font-size: 1.25rem;">Site preparation</h3></div>
+          </article>
+        </div>
+        <div class="flex items-center justify-center gap-4 mt-8" role="group" aria-label="Gallery controls">
+          <button type="button" class="carousel-control" id="work-prev" aria-label="Previous project"><span aria-hidden="true">←</span></button>
+          <div class="flex items-center gap-3" id="work-dots" aria-label="Choose a project"></div>
+          <button type="button" class="carousel-control" id="work-next" aria-label="Next project"><span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+
+      <section id="action" class="mt-28 pt-20" style="border-top: 1px solid rgba(255,255,255,0.08);">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
+          <div>
+            <p class="section-label mb-4">On The Job</p>
+            <h2 class="font-heading text-white" style="font-size: clamp(2.5rem, 5vw, 4rem); line-height: 0.95;">GALLERY</h2>
+          </div>
+          <p class="text-white/50 max-w-md" style="line-height: 1.75; font-weight: 300;">Unfiltered field footage and job-site photography from the work itself, while the machine and crew are in motion.</p>
+        </div>
+        <div class="action-media-layout">
+          <div>
+            <p class="section-label mb-4">Video Gallery</p>
+            <div class="action-video-grid">
+              <div class="work-media"><iframe id="action-video-one" src="https://www.youtube.com/embed/pCWDJIVWToA?autoplay=1&amp;mute=1&amp;playsinline=1&amp;rel=0" title="Apex Terrain tree processing work" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+              <div class="work-media video-placeholder" aria-label="Second work video coming soon"><img src="brand_assets/Gallery 2.jpg" alt="Apex Terrain tree processing video coming soon" /><div class="absolute inset-0 flex items-center justify-center" style="background: rgba(15,15,15,0.64);"><span class="section-label" style="font-size: 0.9rem;">Second video coming soon</span></div></div>
+            </div>
+          </div>
+          <div>
+            <p class="section-label mb-4">Field Photos</p>
+            <div class="action-photo-grid">
+              <div class="work-media" tabindex="0" role="button" aria-label="Open Apex Terrain crew and machine photo"><img src="brand_assets/Gallery/Work in action 1.JPG" alt="Apex Terrain crew and machine working on site" loading="lazy" /></div>
+              <div class="work-media" tabindex="0" role="button" aria-label="Open Apex Terrain field project photo"><img src="brand_assets/Gallery/20260817_141850.jpg" alt="Apex Terrain field project work" loading="lazy" /></div>
+              <div class="work-media" tabindex="0" role="button" aria-label="Open Apex Terrain vegetation work photo"><img src="brand_assets/Gallery/DJI_20260819134651_0067_D.JPG" alt="Apex Terrain machine working through vegetation" loading="lazy" /></div>
+              <div class="work-media" tabindex="0" role="button" aria-label="Open Apex Terrain field work photo"><img src="brand_assets/Gallery/Clean Field - Sandy.JPG" alt="Apex Terrain field work" loading="lazy" /></div>
+              <div class="work-media" tabindex="0" role="button" aria-label="Open Apex Terrain Coquitlam project photo"><img src="brand_assets/Gallery/Coquitlam 1.JPG" alt="Apex Terrain work in Coquitlam" loading="lazy" /></div>
+              <div class="work-media" tabindex="0" role="button" aria-label="Open Apex Terrain equipment photo"><img src="brand_assets/Gallery/DJI_20260819073852_0022_D.JPG" alt="Apex Terrain equipment working on a terrain project" loading="lazy" /></div>
+              <div class="work-media" tabindex="0" role="button" aria-label="Open Apex Terrain vegetation management photo"><img src="brand_assets/Gallery/IMG_5504.jpeg" alt="Apex Terrain crew working on a vegetation management project" loading="lazy" /></div>
+              <div class="work-media" tabindex="0" role="button" aria-label="Open Apex Terrain latest field project photo"><img src="brand_assets/Gallery/20260819_102549.jpg" alt="Apex Terrain latest field project work" loading="lazy" /></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="mt-20">
+        <div class="text-center mb-10">
+          <p class="section-label mb-4">Google Reviews</p>
+          <h2 class="font-heading text-white" style="font-size: clamp(2.3rem, 4vw, 3.5rem);">TRUST BUILT ON <span style="color: #f28c28;">THE GROUND</span></h2>
+          <div class="mt-4 mx-auto" style="width: 60px; height: 3px; background: #f28c28;"></div>
+        </div>
+        <div class="review-card flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div><div class="review-stars" aria-hidden="true">★★★★★</div><p class="mt-4" style="font-size: 1.1rem; line-height: 1.7;">See the latest customer feedback and ratings on our Google Business listing.</p></div>
+          <a href="https://maps.app.goo.gl/MHCschgCxL1J4XPm7" target="_blank" rel="noopener" class="btn-primary flex-shrink-0">Read Google Reviews</a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -424,7 +569,7 @@
 
         <!-- 03 Land Clearing -->
         <div class="service-card">
-          <img class="sc-img" src="brand_assets/Land clearing.jpg" alt="Land clearing service">
+          <img class="sc-img" src="brand_assets/Gallery/20260817_141850.jpg" alt="Land clearing work in progress">
           <div class="sc-num">03</div>
           <div class="sc-content">
             <span class="sc-icon">🌲</span>
@@ -466,7 +611,7 @@
         <h2 class="font-heading text-white" style="font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.02em;">SERVICE <span style="color: #f28c28;">AREA</span></h2>
         <div class="mt-4 mx-auto" style="width: 60px; height: 3px; background: #f28c28;"></div>
         <p class="mt-6 mx-auto text-white/50 max-w-xl" style="line-height: 1.75; font-weight: 300; font-size: 1rem;">
-          Proudly serving the Lower Mainland and the Interior. We travel across BC for the right project&mdash;just ask!
+          Proudly serving Mission, the Fraser Valley, and Southern BC. We travel to Merritt, Kelowna, Kamloops, Cranbrook, and communities across the Interior for the right project&mdash;just ask!
         </p>
       </div>
 
@@ -587,11 +732,11 @@
         <div class="flex flex-wrap gap-4">
           <div class="flex items-center gap-3 px-4 py-3" style="background: rgba(242,140,40,0.08); border: 1px solid rgba(242,140,40,0.2);">
             <div style="width: 6px; height: 6px; background: #f28c28; border-radius: 50%; flex-shrink: 0;"></div>
-            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7);">WorkSafe BC Compliant</span>
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7);">WorkSafe BC Registered</span>
           </div>
           <div class="flex items-center gap-3 px-4 py-3" style="background: rgba(242,140,40,0.08); border: 1px solid rgba(242,140,40,0.2);">
             <div style="width: 6px; height: 6px; background: #f28c28; border-radius: 50%; flex-shrink: 0;"></div>
-            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7);">Environmental Stewardship</span>
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7);">Licensed Operations</span>
           </div>
           <div class="flex items-center gap-3 px-4 py-3" style="background: rgba(242,140,40,0.08); border: 1px solid rgba(242,140,40,0.2);">
             <div style="width: 6px; height: 6px; background: #f28c28; border-radius: 50%; flex-shrink: 0;"></div>
@@ -808,13 +953,13 @@
         <!-- Q5 -->
         <div class="faq-item" style="background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.35);">
           <button class="faq-trigger w-full flex items-center justify-between px-7 py-5 text-left" style="background: none; border: none; cursor: pointer;" aria-expanded="false">
-            <span style="font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 700; color: #1a1a1a;">Are you fully insured and WorkSafe BC compliant?</span>
+            <span style="font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 700; color: #1a1a1a;">Are you insured, licensed, and registered with WorkSafe BC?</span>
             <span class="faq-icon flex items-center justify-center flex-shrink-0" style="width: 34px; height: 34px; border-radius: 50%; background: #f28c28; margin-left: 20px; transition: transform 0.3s ease;">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
             </span>
           </button>
           <div class="faq-body" style="display: none; padding: 0 28px 24px;">
-            <p style="font-family: 'Roboto', sans-serif; font-size: 0.93rem; color: #444; line-height: 1.75; font-weight: 300;">Yes. Safety and professional integrity are our top priorities. Apex Terrain is fully insured for all operations and maintains strict WorkSafe BC compliance to protect our team and your property.</p>
+            <p style="font-family: 'Roboto', sans-serif; font-size: 0.93rem; color: #444; line-height: 1.75; font-weight: 300;">Yes. Apex Terrain is fully insured, licensed, and registered with WorkSafe BC. Safety and professional integrity are our top priorities on every job.</p>
           </div>
         </div>
 
@@ -1054,6 +1199,14 @@
         <div class="lg:col-span-2">
           <img src="brand_assets/Logo.jpeg" alt="Apex Terrain Management" class="h-12 w-auto mb-4" />
           <p class="text-white/40 max-w-xs" style="line-height: 1.75; font-size: 0.9rem; font-weight: 300;">Professional mulching, fire protection, land clearing, and storm clean-up across British Columbia.</p>
+          <div class="flex items-center gap-3 mt-6">
+            <a href="https://www.instagram.com/apexterrain.ca/" target="_blank" rel="noopener" aria-label="Follow Apex Terrain on Instagram" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.65);transition:color 0.2s ease,border-color 0.2s ease,transform 0.15s ease;" onmouseover="this.style.color='#f28c28';this.style.borderColor='#f28c28';this.style.transform='translateY(-2px)'" onmouseout="this.style.color='rgba(255,255,255,0.65)';this.style.borderColor='rgba(255,255,255,0.18)';this.style.transform='translateY(0)'">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.7" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a href="https://www.facebook.com/apexterrain.ca/" target="_blank" rel="noopener" aria-label="Follow Apex Terrain on Facebook" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.65);transition:color 0.2s ease,border-color 0.2s ease,transform 0.15s ease;" onmouseover="this.style.color='#f28c28';this.style.borderColor='#f28c28';this.style.transform='translateY(-2px)'" onmouseout="this.style.color='rgba(255,255,255,0.65)';this.style.borderColor='rgba(255,255,255,0.18)';this.style.transform='translateY(0)'">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8h3V4h-3c-3.3 0-5 1.7-5 5v3H6v4h3v8h4v-8h3.5l.5-4H13V9c0-.7.3-1 1-1z"/></svg>
+            </a>
+          </div>
         </div>
         <div>
           <p class="font-heading-md text-white mb-4" style="font-size: 0.8rem; letter-spacing: 0.14em;">SERVICES</p>
@@ -1079,6 +1232,14 @@
       </div>
     </div>
   </footer>
+
+  <div id="media-lightbox" class="fixed inset-0 z-[70] hidden items-center justify-center p-5" role="dialog" aria-modal="true" aria-label="Expanded project photo">
+    <div class="absolute inset-0" style="background: rgba(0,0,0,0.92);"></div>
+    <button id="lightbox-close" type="button" class="absolute top-5 right-5 z-10 flex items-center justify-center" aria-label="Close expanded photo" style="width:44px;height:44px;border:1px solid rgba(255,255,255,0.35);background:rgba(0,0,0,0.35);color:#fff;font-size:1.6rem;cursor:pointer;">&times;</button>
+    <button id="lightbox-prev" type="button" class="lightbox-nav" aria-label="Previous project photo">&#8592;</button>
+    <img id="lightbox-image" class="relative z-10 max-w-full max-h-full object-contain" src="" alt="" />
+    <button id="lightbox-next" type="button" class="lightbox-nav" aria-label="Next project photo">&#8594;</button>
+  </div>
 
   <script>
     // Nav scroll effect
@@ -1229,6 +1390,102 @@
       el.style.transform = 'translateY(24px)';
       el.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s ease, box-shadow 0.25s ease';
       observer.observe(el);
+    });
+
+    // Before-and-after project carousel
+    const workTrack = document.getElementById('work-track');
+    const workSlides = [...document.querySelectorAll('.work-slide')];
+    const workDots = document.getElementById('work-dots');
+    let workIndex = 0;
+    let workTimer;
+
+    function workVisibleSlides() {
+      if (window.innerWidth < 768) return 1;
+      return 2;
+    }
+
+    function renderWorkDots() {
+      const pageCount = Math.ceil(workSlides.length / workVisibleSlides());
+      workDots.innerHTML = '';
+      for (let i = 0; i < pageCount; i += 1) {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'carousel-dot' + (i === workIndex ? ' active' : '');
+        dot.setAttribute('aria-label', `Show gallery page ${i + 1}`);
+        dot.addEventListener('click', () => goToWork(i));
+        workDots.appendChild(dot);
+      }
+    }
+
+    function goToWork(index) {
+      const pageCount = Math.ceil(workSlides.length / workVisibleSlides());
+      workIndex = (index + pageCount) % pageCount;
+      const slideWidth = workSlides[0].getBoundingClientRect().width + 20;
+      workTrack.style.transform = `translateX(-${workIndex * slideWidth * workVisibleSlides()}px)`;
+      renderWorkDots();
+    }
+
+    function restartWorkTimer() {
+      clearInterval(workTimer);
+      workTimer = setInterval(() => goToWork(workIndex + 1), 5000);
+    }
+
+    document.getElementById('work-prev').addEventListener('click', () => { goToWork(workIndex - 1); restartWorkTimer(); });
+    document.getElementById('work-next').addEventListener('click', () => { goToWork(workIndex + 1); restartWorkTimer(); });
+    window.addEventListener('resize', () => { renderWorkDots(); goToWork(workIndex); });
+    renderWorkDots();
+    goToWork(0);
+    restartWorkTimer();
+
+    // Start the second field clip only after the first one finishes.
+    // Expand Work in Progress photos without leaving the page.
+    const lightbox = document.getElementById('media-lightbox');
+    const lightboxImage = document.getElementById('lightbox-image');
+    const lightboxClose = document.getElementById('lightbox-close');
+    const lightboxPrev = document.getElementById('lightbox-prev');
+    const lightboxNext = document.getElementById('lightbox-next');
+    const photoTiles = [...document.querySelectorAll('.action-photo-grid .work-media')];
+    let lightboxIndex = 0;
+
+    function closeLightbox() {
+      lightbox.classList.add('hidden');
+      lightbox.classList.remove('flex');
+      lightboxImage.src = '';
+    }
+
+    function showLightboxPhoto(index) {
+      lightboxIndex = (index + photoTiles.length) % photoTiles.length;
+      const image = photoTiles[lightboxIndex].querySelector('img');
+      lightboxImage.src = image.src;
+      lightboxImage.alt = image.alt;
+    }
+
+    function openLightbox(tile) {
+      showLightboxPhoto(photoTiles.indexOf(tile));
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+      lightboxClose.focus();
+    }
+
+    photoTiles.forEach(tile => {
+      tile.addEventListener('click', () => openLightbox(tile));
+      tile.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openLightbox(tile);
+        }
+      });
+    });
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxPrev.addEventListener('click', () => showLightboxPhoto(lightboxIndex - 1));
+    lightboxNext.addEventListener('click', () => showLightboxPhoto(lightboxIndex + 1));
+    lightbox.addEventListener('click', event => {
+      if (event.target === lightbox || event.target.classList.contains('absolute')) closeLightbox();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !lightbox.classList.contains('hidden')) closeLightbox();
+      if (event.key === 'ArrowLeft' && !lightbox.classList.contains('hidden')) showLightboxPhoto(lightboxIndex - 1);
+      if (event.key === 'ArrowRight' && !lightbox.classList.contains('hidden')) showLightboxPhoto(lightboxIndex + 1);
     });
 
     // Google Places Autocomplete on the property address field
