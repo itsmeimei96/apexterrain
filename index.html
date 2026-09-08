@@ -190,6 +190,7 @@
       object-fit: cover;
       transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
     }
+    iframe.sc-img { border: 0; pointer-events: none; }
     .sc-content { position: relative; z-index: 3; padding: 2rem; }
     .sc-num {
       position: absolute; top: 1.25rem; right: 1.5rem;
@@ -492,8 +493,8 @@
           <div>
             <p class="section-label mb-4">Video Gallery</p>
             <div class="action-video-grid">
-              <div class="work-media"><iframe id="action-video-one" src="https://www.youtube.com/embed/pCWDJIVWToA?autoplay=1&amp;mute=1&amp;playsinline=1&amp;rel=0" title="Apex Terrain tree processing work" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
-              <div class="work-media video-placeholder" aria-label="Second work video coming soon"><img src="brand_assets/Gallery 2.jpg" alt="Apex Terrain tree processing video coming soon" /><div class="absolute inset-0 flex items-center justify-center" style="background: rgba(15,15,15,0.64);"><span class="section-label" style="font-size: 0.9rem;">Second video coming soon</span></div></div>
+              <div class="work-media"><iframe id="action-video-one" src="https://www.youtube.com/embed/pCWDJIVWToA?autoplay=1&amp;mute=1&amp;playsinline=1&amp;rel=0&amp;enablejsapi=1" title="Apex Terrain tree processing work" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+              <div class="work-media"><iframe id="action-video-two" src="https://www.youtube.com/embed/rzyvA2Hwj8k?autoplay=0&amp;mute=1&amp;playsinline=1&amp;rel=0&amp;enablejsapi=1" title="Apex Terrain tree processing work, clip 2" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
             </div>
           </div>
           <div>
@@ -569,7 +570,7 @@
 
         <!-- 03 Land Clearing -->
         <div class="service-card">
-          <img class="sc-img" src="brand_assets/Gallery/20260817_141850.jpg" alt="Land clearing work in progress">
+          <iframe class="sc-img" src="https://www.youtube.com/embed/oo8ztxz0kTA?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=oo8ztxz0kTA&amp;controls=0&amp;rel=0&amp;playsinline=1" title="Apex Terrain land clearing work" aria-label="Apex Terrain land clearing work video" allow="autoplay; encrypted-media; picture-in-picture"></iframe>
           <div class="sc-num">03</div>
           <div class="sc-content">
             <span class="sc-icon">🌲</span>
@@ -1241,6 +1242,7 @@
     <button id="lightbox-next" type="button" class="lightbox-nav" aria-label="Next project photo">&#8594;</button>
   </div>
 
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     // Nav scroll effect
     const nav = document.getElementById('main-nav');
@@ -1437,7 +1439,21 @@
     goToWork(0);
     restartWorkTimer();
 
-    // Start the second field clip only after the first one finishes.
+    // Start the Outcome video after the first YouTube video finishes.
+    window.onYouTubeIframeAPIReady = function() {
+      const firstYouTubePlayer = new YT.Player('action-video-one', {
+        events: {
+          onStateChange: event => {
+            if (event.data === YT.PlayerState.ENDED) {
+              const secondYouTubePlayer = new YT.Player('action-video-two');
+              secondYouTubePlayer.mute();
+              secondYouTubePlayer.playVideo();
+            }
+          }
+        }
+      });
+    };
+
     // Expand Work in Progress photos without leaving the page.
     const lightbox = document.getElementById('media-lightbox');
     const lightboxImage = document.getElementById('lightbox-image');
